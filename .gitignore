@@ -16,6 +16,7 @@ src/cmd/cloudboot-license-create-tool/
 .cache
 dist
 tsdump
+debug
 
 # Architecture specific extensions/prefixes
 *.[568vq]
