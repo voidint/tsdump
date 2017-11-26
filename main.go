@@ -10,6 +10,7 @@ import (
 	"github.com/voidint/tsdump/config"
 	"github.com/voidint/tsdump/model"
 	"github.com/voidint/tsdump/model/mysql"
+	"github.com/voidint/tsdump/view/txt"
 )
 
 var (
@@ -100,10 +101,8 @@ func main() {
 			return cli.NewExitError(err, 1)
 		}
 
-		fmt.Printf("%d\n", len(dbs))
-
 		// 输出到目标
-
+		_ = txt.NewView().Do(dbs, os.Stdout)
 		return nil
 	}
 
