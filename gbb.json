@@ -1,0 +1,15 @@
+{
+    "version": "0.5.0",
+    "tool": "go install",
+    "importpath": "github.com/voidint/tsdump/build",
+    "variables": [
+        {
+            "variable": "Date",
+            "value": "{{.Date}}"
+        },
+        {
+            "variable": "Commit",
+            "value": "{{.GitCommit}}"
+        }
+    ]
+}
