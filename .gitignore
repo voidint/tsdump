@@ -1,0 +1,40 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+*.db
+
+# Folders
+_obj
+_test
+bin
+pkg
+doc/doc
+src/cmd/cloudboot-license-create-tool/
+.vscode
+.idea/
+.cache
+dist
+tsdump
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
+.DS_Store
+
+# Front
+node_modules/
+
+
+# vim
+*.sw[op]
