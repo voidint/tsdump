@@ -1,5 +1,12 @@
 package model
 
+import "errors"
+
+var (
+	// ErrDBNotFound 数据库不存在
+	ErrDBNotFound = errors.New("db not found")
+)
+
 // DB 数据库实例
 type DB struct {
 	Name      string
@@ -21,7 +28,9 @@ type Table struct {
 
 // Column 列
 type Column struct {
+	DB        string
 	Table     string
+	Name      string
 	Nullable  string
 	DataType  string
 	CharSet   string
@@ -30,8 +39,8 @@ type Column struct {
 	Extra     map[string]string
 }
 
-type Repo interface {
+type IRepo interface {
 	GetDBs(cond *DB) ([]DB, error)
-	GetTables(table *Table) ([]Table, error)
-	GetColumns(col *Column) ([]Column, error)
+	GetTables(cond *Table) ([]Table, error)
+	GetColumns(cond *Column) ([]Column, error)
 }

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/user"
 
 	"github.com/urfave/cli"
 	"github.com/voidint/tsdump/build"
 	"github.com/voidint/tsdump/config"
+	"github.com/voidint/tsdump/model"
+	"github.com/voidint/tsdump/model/mysql"
 )
 
 var (
@@ -54,22 +57,53 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "d, db",
-			Usage:       "MySQL database name",
+			Usage:       "Database name.",
 			Destination: &c.DB,
 		},
 		cli.StringFlag{
-			Name:        "f, formatter",
+			Name:        "V, viewer",
 			Value:       "txt",
-			Usage:       "text, csv, markdown",
-			Destination: &c.Formatter,
+			Usage:       "Viewer",
+			Destination: &c.Viewer,
 		},
 		cli.StringFlag{
 			Name:        "o, output",
 			Usage:       "Write to a file, instead of STDOUT.",
 			Destination: &c.Output,
 		},
+		cli.BoolFlag{
+			Name:        "D, debug",
+			Usage:       "Enable debug mode.",
+			Destination: &c.Debug,
+		},
 	}
 	app.Action = func(ctx *cli.Context) error {
+		if c.Debug {
+			fmt.Println(c)
+		}
+
+		repo, err := mysql.NewRepo(&c)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		// 获取数据
+		var dbs []model.DB
+		if c.DB != "" {
+			dbs, err = repo.GetDBs(&model.DB{
+				Name: c.DB,
+			})
+		} else {
+			dbs, err = repo.GetDBs(nil)
+		}
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		fmt.Printf("%d\n", len(dbs))
+
+		// 输出到目标
+
 		return nil
 	}
 
