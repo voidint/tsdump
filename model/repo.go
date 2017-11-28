@@ -7,7 +7,7 @@ var (
 	ErrDBNotFound = errors.New("db not found")
 )
 
-// DB 数据库实例
+// DB 数据库实例元信息
 type DB struct {
 	Name      string
 	CharSet   string
@@ -16,7 +16,7 @@ type DB struct {
 	Extra     map[string]string
 }
 
-// Table 表
+// Table 表元信息
 type Table struct {
 	DB        string
 	Name      string
@@ -26,7 +26,7 @@ type Table struct {
 	Extra     map[string]string
 }
 
-// Column 列
+// Column 列元信息
 type Column struct {
 	DB        string
 	Table     string
@@ -39,8 +39,12 @@ type Column struct {
 	Extra     map[string]string
 }
 
+// IRepo 数据库元信息查询接口
 type IRepo interface {
+	// GetDBs 查询数据库元信息
 	GetDBs(cond *DB) ([]DB, error)
+	// GetTables 查询表元信息
 	GetTables(cond *Table) ([]Table, error)
+	// GetColumns 查询列元信息
 	GetColumns(cond *Column) ([]Column, error)
 }

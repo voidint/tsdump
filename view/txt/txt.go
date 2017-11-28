@@ -22,14 +22,14 @@ func (v *TXTView) Do(items []model.DB, out io.Writer) error {
 		dbT.SetWrapStrings(true)
 		dbT.SetMaxCellSize(16)
 		dbT.SetAlign("left")
-		fmt.Println(dbT.Render("grid"))
+		fmt.Fprintln(out, dbT.Render("grid"))
 
 		for j := range items[i].Tables {
 			tabT := v.tableTabulate(&items[i].Tables[j])
 			tabT.SetWrapStrings(true)
 			tabT.SetMaxCellSize(16)
 			tabT.SetAlign("left")
-			fmt.Println(tabT.Render("grid"))
+			fmt.Fprintln(out, tabT.Render("grid"))
 		}
 	}
 

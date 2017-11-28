@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/user"
 
@@ -24,13 +25,22 @@ func init() {
 	}
 }
 
-var c config.Config
+var (
+	c   config.Config
+	out io.Writer = os.Stdout
+)
 
 func main() {
 	app := cli.NewApp()
-	app.Name = ""
-	app.Usage = ""
+	app.Name = "tsdump"
+	app.Usage = "Database table structure dump tool."
 	app.Version = build.Version("0.1.0")
+	app.Authors = []cli.Author{
+		cli.Author{
+			Name:  "voidnt",
+			Email: "voidint@126.com",
+		},
+	}
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -88,7 +98,7 @@ func main() {
 			return cli.NewExitError(err, 1)
 		}
 
-		// 获取数据
+		// Get metadata
 		var dbs []model.DB
 		if c.DB != "" {
 			dbs, err = repo.GetDBs(&model.DB{
@@ -101,8 +111,17 @@ func main() {
 			return cli.NewExitError(err, 1)
 		}
 
-		// 输出到目标
-		_ = txt.NewView().Do(dbs, os.Stdout)
+		if len(c.Output) > 0 {
+			var f *os.File
+			if f, err = os.Create(c.Output); err != nil {
+				return cli.NewExitError(err, 1)
+			}
+			defer f.Close()
+			out = f
+		}
+
+		// Output as target view
+		_ = txt.NewView().Do(dbs, out)
 		return nil
 	}
 
