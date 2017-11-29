@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/bndr/gotabulate"
+	"github.com/olekukonko/tablewriter"
 	"github.com/voidint/tsdump/model"
 	"github.com/voidint/tsdump/view"
 )
@@ -18,32 +18,32 @@ func NewView() view.Viewer {
 
 func (v *TXTView) Do(items []model.DB, out io.Writer) error {
 	for i := range items {
-		dbT := v.dbTabulate(&items[i])
-		dbT.SetAlign("left")
-		fmt.Fprintln(out, dbT.Render("grid"))
-
+		v.renderDB(&items[i], out)
+		fmt.Fprintln(out)
 		for j := range items[i].Tables {
-			fmt.Fprintf(out, "Table:\t%s\t%s\n",
+			fmt.Fprintf(out, "TABLE:\t%s\t%s\n",
 				items[i].Tables[j].Name,
 				items[i].Tables[j].Comment,
 			)
-			tabT := v.tableTabulate(&items[i].Tables[j])
-			tabT.SetAlign("left")
-			fmt.Fprintln(out, tabT.Render("grid"))
+			v.renderTable(&items[i].Tables[j], out)
+			fmt.Fprintln(out)
 		}
 	}
 	return nil
 }
 
-func (v *TXTView) dbTabulate(db *model.DB) *gotabulate.Tabulate {
-	headers := []string{"Database", "Character Set", "Collation"}
-	row := []string{db.Name, db.CharSet, db.Collation}
+func (v *TXTView) renderDB(db *model.DB, out io.Writer) error {
+	rows := [][]string{[]string{db.Name, db.CharSet, db.Collation}}
 
-	return gotabulate.Create([][]string{row}).SetHeaders(headers)
+	t := tablewriter.NewWriter(out)
+	t.SetHeader([]string{"Database", "Character Set", "Collation"})
+	t.SetCenterSeparator("|")
+	t.AppendBulk(rows)
+	t.Render()
+	return nil
 }
 
-func (v *TXTView) tableTabulate(table *model.Table) *gotabulate.Tabulate {
-	headers := []string{"Column", "Nullable", "Data Type", "Character Set", "Collation", "Comment"}
+func (v *TXTView) renderTable(table *model.Table, out io.Writer) {
 	rows := make([][]string, 0, len(table.Columns))
 	for i := range table.Columns {
 		rows = append(rows, []string{
@@ -55,6 +55,10 @@ func (v *TXTView) tableTabulate(table *model.Table) *gotabulate.Tabulate {
 			table.Columns[i].Comment,
 		})
 	}
-	return gotabulate.Create(rows).SetHeaders(headers)
 
+	t := tablewriter.NewWriter(out)
+	t.SetHeader([]string{"Column", "Nullable", "Data Type", "Character Set", "Collation", "Comment"})
+	t.SetCenterSeparator("|")
+	t.AppendBulk(rows)
+	t.Render()
 }
