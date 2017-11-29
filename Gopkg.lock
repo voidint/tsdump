@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/bndr/gotabulate"
-  packages = ["."]
-  revision = "94ff52dbe671866d4f5cd3463ecdad8ec550e578"
-  version = "v1.1.2"
-
-[[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   revision = "a0583e0143b1624142adab07e0e97fe106d99561"
@@ -52,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cd4ce58df9cee65d8017cdb47ab267cd42e659b1f4f9e4b7cb3b0f283dbc68ce"
+  inputs-digest = "b3d0b51d8861dd62ce52a49c04e6ce06acd543bd3f0c9dc9e823715e5eb8d932"
   solver-name = "gps-cdcl"
   solver-version = 1

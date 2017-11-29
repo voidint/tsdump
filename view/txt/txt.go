@@ -19,20 +19,19 @@ func NewView() view.Viewer {
 func (v *TXTView) Do(items []model.DB, out io.Writer) error {
 	for i := range items {
 		dbT := v.dbTabulate(&items[i])
-		dbT.SetWrapStrings(true)
-		dbT.SetMaxCellSize(16)
 		dbT.SetAlign("left")
 		fmt.Fprintln(out, dbT.Render("grid"))
 
 		for j := range items[i].Tables {
+			fmt.Fprintf(out, "Table:\t%s\t%s\n",
+				items[i].Tables[j].Name,
+				items[i].Tables[j].Comment,
+			)
 			tabT := v.tableTabulate(&items[i].Tables[j])
-			tabT.SetWrapStrings(true)
-			tabT.SetMaxCellSize(16)
 			tabT.SetAlign("left")
 			fmt.Fprintln(out, tabT.Render("grid"))
 		}
 	}
-
 	return nil
 }
 
