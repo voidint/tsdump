@@ -11,7 +11,19 @@ import (
 	"github.com/voidint/tsdump/config"
 	"github.com/voidint/tsdump/model"
 	"github.com/voidint/tsdump/model/mysql"
+	"github.com/voidint/tsdump/view/md"
 	"github.com/voidint/tsdump/view/txt"
+)
+
+const (
+	// TextView 纯文本视图
+	TextView = "txt"
+	// MarkdownView markdown文本视图
+	MarkdownView = "md"
+	// CSVView CSV文本视图
+	CSVView = "csv"
+	// JSONView JSON文本视图
+	JSONView = "json"
 )
 
 var (
@@ -74,7 +86,7 @@ func main() {
 		cli.StringFlag{
 			Name:        "V, viewer",
 			Value:       "txt",
-			Usage:       "Viewer",
+			Usage:       "Output viewer. Optional values: txt|md|csv|json",
 			Destination: &c.Viewer,
 		},
 		cli.StringFlag{
@@ -120,8 +132,20 @@ func main() {
 			out = f
 		}
 
-		// Output as target view
-		_ = txt.NewView().Do(dbs, out)
+		// Output as target viewer
+		switch c.Viewer {
+		case TextView:
+			_ = txt.NewView().Do(dbs, out)
+		case MarkdownView:
+			_ = md.NewView().Do(dbs, out)
+		case CSVView:
+			return cli.NewExitError(fmt.Sprintf("%q is not supported yet.", c.Viewer), 0)
+		case JSONView:
+			return cli.NewExitError(fmt.Sprintf("%q is not supported yet.", c.Viewer), 0)
+		default:
+			return cli.NewExitError(fmt.Sprintf("Unsupported viewer: %s", c.Viewer), 1)
+		}
+
 		return nil
 	}
 
