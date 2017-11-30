@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -144,13 +145,19 @@ func main() {
 				return cli.NewExitError(err, 1)
 			}
 		case JSONView:
-			return cli.NewExitError(fmt.Sprintf("%q is not supported yet.", c.Viewer), 0)
+			enc := json.NewEncoder(out)
+			enc.SetIndent("  ", "  ")
+			if err = enc.Encode(dbs); err != nil {
+				return cli.NewExitError(err, 1)
+			}
 		default:
-			return cli.NewExitError(fmt.Sprintf("Unsupported viewer: %s", c.Viewer), 1)
+			return cli.NewExitError(fmt.Sprintf("unsupported viewer: %s", c.Viewer), 1)
 		}
-
 		return nil
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
