@@ -11,6 +11,7 @@ import (
 	"github.com/voidint/tsdump/config"
 	"github.com/voidint/tsdump/model"
 	"github.com/voidint/tsdump/model/mysql"
+	"github.com/voidint/tsdump/view/csv"
 	"github.com/voidint/tsdump/view/md"
 	"github.com/voidint/tsdump/view/txt"
 )
@@ -139,7 +140,9 @@ func main() {
 		case MarkdownView:
 			_ = md.NewView().Do(dbs, out)
 		case CSVView:
-			return cli.NewExitError(fmt.Sprintf("%q is not supported yet.", c.Viewer), 0)
+			if err = csv.NewView().Do(dbs, out); err != nil {
+				return cli.NewExitError(err, 1)
+			}
 		case JSONView:
 			return cli.NewExitError(fmt.Sprintf("%q is not supported yet.", c.Viewer), 0)
 		default:

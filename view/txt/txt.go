@@ -32,7 +32,7 @@ func (v *TXTView) Do(items []model.DB, out io.Writer) error {
 	return nil
 }
 
-func (v *TXTView) renderDB(db *model.DB, out io.Writer) error {
+func (v *TXTView) renderDB(db *model.DB, out io.Writer) {
 	rows := [][]string{[]string{db.Name, db.CharSet, db.Collation}}
 
 	t := tablewriter.NewWriter(out)
@@ -40,7 +40,6 @@ func (v *TXTView) renderDB(db *model.DB, out io.Writer) error {
 	t.SetCenterSeparator("|")
 	t.AppendBulk(rows)
 	t.Render()
-	return nil
 }
 
 func (v *TXTView) renderTable(table *model.Table, out io.Writer) {
