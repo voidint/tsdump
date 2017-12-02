@@ -1,31 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"os/user"
+	"strings"
 
 	"github.com/urfave/cli"
 	"github.com/voidint/tsdump/build"
 	"github.com/voidint/tsdump/config"
 	"github.com/voidint/tsdump/model"
 	"github.com/voidint/tsdump/model/mysql"
-	"github.com/voidint/tsdump/view/csv"
-	"github.com/voidint/tsdump/view/md"
+	"github.com/voidint/tsdump/view"
 	"github.com/voidint/tsdump/view/txt"
-)
 
-const (
-	// TextView 纯文本视图
-	TextView = "txt"
-	// MarkdownView markdown文本视图
-	MarkdownView = "md"
-	// CSVView CSV文本视图
-	CSVView = "csv"
-	// JSONView JSON文本视图
-	JSONView = "json"
+	_ "github.com/voidint/tsdump/view/csv"
+	_ "github.com/voidint/tsdump/view/json"
+	_ "github.com/voidint/tsdump/view/md"
+	_ "github.com/voidint/tsdump/view/txt"
 )
 
 var (
@@ -86,9 +79,12 @@ func main() {
 			Destination: &c.DB,
 		},
 		cli.StringFlag{
-			Name:        "V, viewer",
-			Value:       "txt",
-			Usage:       "Output viewer. Optional values: txt|md|csv|json",
+			Name:  "V, viewer",
+			Value: txt.Name,
+			Usage: fmt.Sprintf(
+				"Output viewer. Optional values: %s",
+				strings.Join(view.Registered(), "|"),
+			),
 			Destination: &c.Viewer,
 		},
 		cli.StringFlag{
@@ -135,23 +131,12 @@ func main() {
 		}
 
 		// Output as target viewer
-		switch c.Viewer {
-		case TextView:
-			_ = txt.NewView().Do(dbs, out)
-		case MarkdownView:
-			_ = md.NewView().Do(dbs, out)
-		case CSVView:
-			if err = csv.NewView().Do(dbs, out); err != nil {
-				return cli.NewExitError(err, 1)
-			}
-		case JSONView:
-			enc := json.NewEncoder(out)
-			enc.SetIndent("  ", "  ")
-			if err = enc.Encode(dbs); err != nil {
-				return cli.NewExitError(err, 1)
-			}
-		default:
-			return cli.NewExitError(fmt.Sprintf("unsupported viewer: %s", c.Viewer), 1)
+		v := view.SelectViewer(c.Viewer)
+		if v == nil {
+			return cli.NewExitError(fmt.Sprintf("[tsdump] unsupported viewer: %q", c.Viewer), 1)
+		}
+		if err = v.Do(dbs, out); err != nil {
+			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 		return nil
 	}

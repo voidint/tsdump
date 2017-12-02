@@ -9,14 +9,26 @@ import (
 	"github.com/voidint/tsdump/view"
 )
 
-type CSVView struct {
+func init() {
+	view.Register(Name, NewView())
 }
 
+const (
+	// Name 视图名称
+	Name = "csv"
+)
+
+// View CSV视图
+type View struct {
+}
+
+// NewView 返回CSV视图实例
 func NewView() view.Viewer {
-	return new(CSVView)
+	return new(View)
 }
 
-func (v *CSVView) Do(items []model.DB, out io.Writer) (err error) {
+// Do 将数据库元数据以CSV视图形式输出。
+func (v *View) Do(items []model.DB, out io.Writer) (err error) {
 	for i := range items {
 		if err = v.renderDB(&items[i], out); err != nil {
 			return err
@@ -36,7 +48,7 @@ func (v *CSVView) Do(items []model.DB, out io.Writer) (err error) {
 	return nil
 }
 
-func (v *CSVView) renderDB(db *model.DB, out io.Writer) error {
+func (v *View) renderDB(db *model.DB, out io.Writer) error {
 	rows := [][]string{
 		[]string{"Database", "Character Set", "Collation"},
 		[]string{db.Name, db.CharSet, db.Collation},
@@ -44,7 +56,7 @@ func (v *CSVView) renderDB(db *model.DB, out io.Writer) error {
 	return csv.NewWriter(out).WriteAll(rows)
 }
 
-func (v *CSVView) renderTable(table *model.Table, out io.Writer) error {
+func (v *View) renderTable(table *model.Table, out io.Writer) error {
 	rows := make([][]string, 0, len(table.Columns)+1)
 	rows = append(rows, []string{"Column", "Nullable", "Data Type", "Character Set", "Collation", "Comment"})
 	for i := range table.Columns {
