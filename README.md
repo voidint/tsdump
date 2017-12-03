@@ -1,5 +1,6 @@
 # tsdump
 [![Build Status](https://travis-ci.org/voidint/tsdump.svg?branch=master)](https://travis-ci.org/voidint/tsdump)
+[![Coverage Status](https://coveralls.io/repos/github/voidint/tsdump/badge.svg?branch=master)](https://coveralls.io/github/voidint/tsdump?branch=master)
 
 ## 目录
 - [特性](#特性)
