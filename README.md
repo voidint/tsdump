@@ -115,3 +115,8 @@ GLOBAL OPTIONS:
     ```
 
 ## Changelog
+### 0.1.0
+- 支持以'csv'视图方式导出表结构数据。[#1](https://github.com/voidint/tsdump/issues/1)
+- 支持以'markdown'视图方式导出表结构数据。[#2](https://github.com/voidint/tsdump/issues/2)
+- 支持以'text'视图方式导出表结构数据。[#3](https://github.com/voidint/tsdump/issues/3)
+- 支持以'json'视图方式导出表结构数据。[#4](https://github.com/voidint/tsdump/issues/4)
