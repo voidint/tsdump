@@ -5,7 +5,7 @@
 - [特性](#特性)
 - [安装](#安装)
 - [基本使用](#基本使用)
-- [Changelog](#Changelog)
+- [Changelog](#changelog)
 
 ## 特性
 - 支持将数据库(当前仅支持`MySQL`)及其表结构的元数据以`text`、`markdown`、`json`、`csv`形式输出。
@@ -17,6 +17,21 @@ $ go get -u github.com/voidint/tsdump
 ```
 
 ## 基本使用
+- 全局选项
+```shell
+GLOBAL OPTIONS:
+   -H value, --host value      Connect to host. (default: "127.0.0.1")
+   -P value, --port value      Port number to use for connection. (default: 3306)
+   -u value, --user value      User for login if not current user. (default: "voidint")
+   -p value, --password value  Password to use when connecting to server.
+   -d value, --db value        Database name.
+   -V value, --viewer value    Output viewer. Optional values: txt|csv|json|md (default: "txt")
+   -o value, --output value    Write to a file, instead of STDOUT.
+   -D, --debug                 Enable debug mode.
+   --help, -h                  show help
+   --version, -v               print the version
+```
+
 - 使用`root`用户创建一个名为`mydb`的数据库实例，以及一张`student`的表。
     ```SQL
     CREATE DATABASE IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
