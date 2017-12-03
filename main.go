@@ -99,13 +99,9 @@ func main() {
 		},
 	}
 	app.Action = func(ctx *cli.Context) error {
-		if c.Debug {
-			fmt.Println(c)
-		}
-
 		repo, err := mysql.NewRepo(&c)
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 
 		// Get metadata
@@ -118,13 +114,13 @@ func main() {
 			dbs, err = repo.GetDBs(nil)
 		}
 		if err != nil {
-			return cli.NewExitError(err, 1)
+			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 
 		if len(c.Output) > 0 {
 			var f *os.File
 			if f, err = os.Create(c.Output); err != nil {
-				return cli.NewExitError(err, 1)
+				return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 			}
 			defer f.Close()
 			out = f
@@ -142,7 +138,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("[tsdump] %s", err.Error()))
 		os.Exit(1)
 	}
 }
