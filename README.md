@@ -65,21 +65,21 @@ GLOBAL OPTIONS:
     |----------|---------------|--------------------|
 
     TABLE:	student	学生信息表
-    |----------|----------|--------------|---------------|--------------------|----------|
-    |  COLUMN  | NULLABLE |  DATA TYPE   | CHARACTER SET |     COLLATION      | COMMENT  |
-    |----------|----------|--------------|---------------|--------------------|----------|
-    | sno      | NO       | char(8)      | utf8mb4       | utf8mb4_general_ci | 学号     |
-    | sname    | NO       | varchar(255) | utf8mb4       | utf8mb4_general_ci | 姓名     |
-    | gender   | YES      | char(2)      | utf8mb4       | utf8mb4_general_ci | 性别     |
-    | native   | YES      | char(20)     | utf8mb4       | utf8mb4_general_ci | 籍贯     |
-    | birthday | YES      | datetime     |               |                    | 出生日期 |
-    | dno      | YES      | char(6)      | utf8mb4       | utf8mb4_general_ci | 所在院系 |
-    | spno     | YES      | char(8)      | utf8mb4       | utf8mb4_general_ci | 专业代码 |
-    | classno  | YES      | char(4)      | utf8mb4       | utf8mb4_general_ci | 班级号   |
-    | entime   | YES      | date         |               |                    | 入校时间 |
-    | home     | YES      | varchar(40)  | utf8mb4       | utf8mb4_general_ci | 家庭住址 |
-    | tell     | YES      | varchar(40)  | utf8mb4       | utf8mb4_general_ci | 联系电话 |
-    |----------|----------|--------------|---------------|--------------------|----------|
+    |----------|--------------|----------|-----|---------|---------------|--------------------|----------|
+    |  COLUMN  |  DATA TYPE   | NULLABLE | KEY | DEFAULT | CHARACTER SET |     COLLATION      | COMMENT  |
+    |----------|--------------|----------|-----|---------|---------------|--------------------|----------|
+    | sno      | char(8)      | NO       | PRI |         | utf8mb4       | utf8mb4_general_ci | 学号     |
+    | sname    | varchar(255) | NO       |     |         | utf8mb4       | utf8mb4_general_ci | 姓名     |
+    | gender   | char(2)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 性别     |
+    | native   | char(20)     | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 籍贯     |
+    | birthday | datetime     | YES      |     |         |               |                    | 出生日期 |
+    | dno      | char(6)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 所在院系 |
+    | spno     | char(8)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 专业代码 |
+    | classno  | char(4)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 班级号   |
+    | entime   | date         | YES      |     |         |               |                    | 入校时间 |
+    | home     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 家庭住址 |
+    | tell     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 联系电话 |
+    |----------|--------------|----------|-----|---------|---------------|--------------------|----------|
     ```
 
 - 将数据库及其表结构数据输出到markdown文件
@@ -88,22 +88,27 @@ GLOBAL OPTIONS:
     ```
 
     output: 
+
+    | DATABASE | CHARACTER SET |     COLLATION      |
+    |----------|---------------|--------------------|
+    | mydb     | utf8mb4       | utf8mb4_general_ci |
+
     ### `student`
     学生信息表
 
-    |  COLUMN  | NULLABLE |  DATA TYPE   | CHARACTER SET |     COLLATION      | COMMENT  |
-    |----------|----------|--------------|---------------|--------------------|----------|
-    | sno      | NO       | char(8)      | utf8mb4       | utf8mb4_general_ci | 学号     |
-    | sname    | NO       | varchar(255) | utf8mb4       | utf8mb4_general_ci | 姓名     |
-    | gender   | YES      | char(2)      | utf8mb4       | utf8mb4_general_ci | 性别     |
-    | native   | YES      | char(20)     | utf8mb4       | utf8mb4_general_ci | 籍贯     |
-    | birthday | YES      | datetime     |               |                    | 出生日期 |
-    | dno      | YES      | char(6)      | utf8mb4       | utf8mb4_general_ci | 所在院系 |
-    | spno     | YES      | char(8)      | utf8mb4       | utf8mb4_general_ci | 专业代码 |
-    | classno  | YES      | char(4)      | utf8mb4       | utf8mb4_general_ci | 班级号   |
-    | entime   | YES      | date         |               |                    | 入校时间 |
-    | home     | YES      | varchar(40)  | utf8mb4       | utf8mb4_general_ci | 家庭住址 |
-    | tell     | YES      | varchar(40)  | utf8mb4       | utf8mb4_general_ci | 联系电话 |
+    |  COLUMN  |  DATA TYPE   | NULLABLE | KEY | DEFAULT | CHARACTER SET |     COLLATION      | COMMENT  |
+    |----------|--------------|----------|-----|---------|---------------|--------------------|----------|
+    | sno      | char(8)      | NO       | PRI |         | utf8mb4       | utf8mb4_general_ci | 学号     |
+    | sname    | varchar(255) | NO       |     |         | utf8mb4       | utf8mb4_general_ci | 姓名     |
+    | gender   | char(2)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 性别     |
+    | native   | char(20)     | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 籍贯     |
+    | birthday | datetime     | YES      |     |         |               |                    | 出生日期 |
+    | dno      | char(6)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 所在院系 |
+    | spno     | char(8)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 专业代码 |
+    | classno  | char(4)      | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 班级号   |
+    | entime   | date         | YES      |     |         |               |                    | 入校时间 |
+    | home     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 家庭住址 |
+    | tell     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 联系电话 |
 
 - 将数据库及其表结构数据输出到csv文件
     ```shell
@@ -117,7 +122,7 @@ GLOBAL OPTIONS:
 
 ## Changelog
 ### 0.1.0
-- 支持以'csv'视图方式导出表结构数据。[#1](https://github.com/voidint/tsdump/issues/1)
-- 支持以'markdown'视图方式导出表结构数据。[#2](https://github.com/voidint/tsdump/issues/2)
-- 支持以'text'视图方式导出表结构数据。[#3](https://github.com/voidint/tsdump/issues/3)
-- 支持以'json'视图方式导出表结构数据。[#4](https://github.com/voidint/tsdump/issues/4)
+- 支持以`csv`视图方式导出表结构数据。[#1](https://github.com/voidint/tsdump/issues/1)
+- 支持以`markdown`视图方式导出表结构数据。[#2](https://github.com/voidint/tsdump/issues/2)
+- 支持以`text`视图方式导出表结构数据。[#3](https://github.com/voidint/tsdump/issues/3)
+- 支持以`json`视图方式导出表结构数据。[#4](https://github.com/voidint/tsdump/issues/4)
