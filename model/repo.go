@@ -31,8 +31,10 @@ type Column struct {
 	DB        string
 	Table     string
 	Name      string
+	Default   string
 	Nullable  string
 	DataType  string
+	Key       string
 	CharSet   string
 	Collation string
 	Comment   string

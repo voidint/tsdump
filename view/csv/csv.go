@@ -58,12 +58,14 @@ func (v *View) renderDB(db *model.DB, out io.Writer) error {
 
 func (v *View) renderTable(table *model.Table, out io.Writer) error {
 	rows := make([][]string, 0, len(table.Columns)+1)
-	rows = append(rows, []string{"Column", "Nullable", "Data Type", "Character Set", "Collation", "Comment"})
+	rows = append(rows, []string{"Column", "Data Type", "Nullable", "Key", "Default", "Character Set", "Collation", "Comment"})
 	for i := range table.Columns {
 		rows = append(rows, []string{
 			table.Columns[i].Name,
-			table.Columns[i].Nullable,
 			table.Columns[i].DataType,
+			table.Columns[i].Nullable,
+			table.Columns[i].Key,
+			table.Columns[i].Default,
 			table.Columns[i].CharSet,
 			table.Columns[i].Collation,
 			table.Columns[i].Comment,

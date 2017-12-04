@@ -74,8 +74,10 @@ type column struct {
 	Schema    string `xorm:"'TABLE_SCHEMA'"`
 	Table     string `xorm:"'TABLE_NAME'"`
 	Name      string `xorm:"'COLUMN_NAME'"`
+	Default   string `xorm:"'COLUMN_DEFAULT'"`
 	Nullable  string `xorm:"'IS_NULLABLE'"`
 	DataType  string `xorm:"'COLUMN_TYPE'"`
+	Key       string `xorm:"'COLUMN_KEY'"`
 	CharSet   string `xorm:"'CHARACTER_SET_NAME'"`
 	Collation string `xorm:"'COLLATION_NAME'"`
 	Comment   string `xorm:"'COLUMN_COMMENT'"`
@@ -169,10 +171,12 @@ func (repo *Repo) GetColumns(cond *model.Column) (items []model.Column, err erro
 		cCond.Schema = cond.DB
 		cCond.Table = cond.Table
 		cCond.Name = cond.Name
+		cCond.Default = cond.Default
 		cCond.Nullable = cond.Nullable
 		cCond.CharSet = cond.CharSet
 		cCond.Collation = cond.Collation
 		cCond.DataType = cond.DataType
+		cCond.Key = cond.Key
 		cCond.Comment = cond.Comment
 	}
 	cols, err := repo.getColumns(&cCond)
@@ -185,8 +189,10 @@ func (repo *Repo) GetColumns(cond *model.Column) (items []model.Column, err erro
 			DB:        cols[i].Schema,
 			Table:     cols[i].Table,
 			Name:      cols[i].Name,
+			Default:   cols[i].Default,
 			Nullable:  cols[i].Nullable,
 			DataType:  cols[i].DataType,
+			Key:       cols[i].Key,
 			CharSet:   cols[i].CharSet,
 			Collation: cols[i].Collation,
 			Comment:   cols[i].Comment,
