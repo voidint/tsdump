@@ -44,7 +44,7 @@ type Column struct {
 // IRepo 数据库元信息查询接口
 type IRepo interface {
 	// GetDBs 查询数据库元信息
-	GetDBs(cond *DB) ([]DB, error)
+	GetDBs(cond *DB, lazy bool) ([]DB, error)
 	// GetTables 查询表元信息
 	GetTables(cond *Table) ([]Table, error)
 	// GetColumns 查询列元信息

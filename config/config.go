@@ -7,6 +7,7 @@ type Config struct {
 	Username string
 	Password string
 	DB       string
+	Tables   []string
 	Viewer   string
 	Output   string
 	Debug    bool

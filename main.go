@@ -51,6 +51,11 @@ func main() {
 	}
 
 	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:        "D, debug",
+			Usage:       "enable debug mode",
+			Destination: &c.Debug,
+		},
 		cli.StringFlag{
 			Name:        "H, host",
 			Value:       "127.0.0.1",
@@ -70,11 +75,6 @@ func main() {
 			Destination: &c.Username,
 		},
 		cli.StringFlag{
-			Name:        "d, db",
-			Usage:       "database name",
-			Destination: &c.DB,
-		},
-		cli.StringFlag{
 			Name:  "V, viewer",
 			Value: txt.Name,
 			Usage: fmt.Sprintf(
@@ -88,38 +88,35 @@ func main() {
 			Usage:       "write to a file, instead of STDOUT",
 			Destination: &c.Output,
 		},
-		cli.BoolFlag{
-			Name:        "D, debug",
-			Usage:       "enable debug mode",
-			Destination: &c.Debug,
-		},
 	}
-	app.Action = func(ctx *cli.Context) (err error) {
+
+	app.Before = func(ctx *cli.Context) (err error) {
+		if args := ctx.Args(); len(args) > 0 {
+			c.DB = args.First()
+			c.Tables = args.Tail()
+		}
+
 		var passwd []byte
 		if passwd, err = readPassword(); err != nil {
 			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 		c.Password = string(passwd)
+		return nil
+	}
 
+	app.Action = func(ctx *cli.Context) (err error) {
 		repo, err := mysql.NewRepo(&c)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 
-		// Get metadata
-		var dbs []model.DB
-		if c.DB != "" {
-			dbs, err = repo.GetDBs(&model.DB{
-				Name: c.DB,
-			})
-		} else {
-			dbs, err = repo.GetDBs(nil)
-		}
+		// Get db and table metadata
+		dbs, err := getMetadata(repo, c.DB, c.Tables...)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 		}
 
-		if len(c.Output) > 0 {
+		if c.Output != "" {
 			var f *os.File
 			if f, err = os.Create(c.Output); err != nil {
 				return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
@@ -147,6 +144,48 @@ func main() {
 
 // readPassword 从stdin读取密码
 func readPassword() (passwd []byte, err error) {
+	defer fmt.Println()
 	fmt.Print("Enter Password: ")
 	return terminal.ReadPassword(int(os.Stdin.Fd()))
+}
+
+// getMetadata 根据目标数据库名和表名，返回目标数据库及其表的元数据。
+func getMetadata(repo model.IRepo, db string, tables ...string) (dbs []model.DB, err error) {
+	if db == "" && len(tables) > 0 {
+		panic("unreachable")
+	}
+
+	// 获取所有数据库下的表
+	if db == "" {
+		return repo.GetDBs(nil, false)
+	}
+
+	// 获取单个数据库下的表
+	if len(tables) == 0 {
+		return repo.GetDBs(&model.DB{
+			Name: db,
+		}, false)
+	}
+
+	// 获取单个数据库下的若干表
+	dbs, err = repo.GetDBs(&model.DB{
+		Name: c.DB,
+	}, true)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range dbs {
+		for j := range tables {
+			tables, err := repo.GetTables(&model.Table{
+				DB:   dbs[i].Name,
+				Name: tables[j],
+			})
+			if err != nil {
+				return nil, err
+			}
+			dbs[i].Tables = append(dbs[i].Tables, tables...)
+		}
+	}
+	return dbs, nil
 }

@@ -95,7 +95,7 @@ func (repo *Repo) getColumns(cond *column) (items []column, err error) {
 }
 
 // GetDBs 按条件查询数据库信息
-func (repo *Repo) GetDBs(cond *model.DB) (items []model.DB, err error) {
+func (repo *Repo) GetDBs(cond *model.DB, lazy bool) (items []model.DB, err error) {
 	var sCond schema
 	if cond != nil {
 		sCond.Name = cond.Name
@@ -113,11 +113,14 @@ func (repo *Repo) GetDBs(cond *model.DB) (items []model.DB, err error) {
 	}
 
 	for i := range schemas {
-		tables, err := repo.GetTables(&model.Table{
-			DB: schemas[i].Name,
-		})
-		if err != nil {
-			return nil, err
+		var tables []model.Table
+		if !lazy {
+			tables, err = repo.GetTables(&model.Table{
+				DB: schemas[i].Name,
+			})
+			if err != nil {
+				return nil, err
+			}
 		}
 		items = append(items, model.DB{
 			Name:      schemas[i].Name,
