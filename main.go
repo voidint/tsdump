@@ -53,48 +53,48 @@ func main() {
 		cli.StringFlag{
 			Name:        "H, host",
 			Value:       "127.0.0.1",
-			Usage:       "Connect to host.",
+			Usage:       "connect to host",
 			Destination: &c.Host,
 		},
 		cli.IntFlag{
 			Name:        "P, port",
 			Value:       3306,
-			Usage:       "Port number to use for connection.",
+			Usage:       "port number to use for connection",
 			Destination: &c.Port,
 		},
 		cli.StringFlag{
 			Name:        "u, user",
 			Value:       username,
-			Usage:       "User for login if not current user.",
+			Usage:       "user for login if not current user",
 			Destination: &c.Username,
 		},
 		cli.StringFlag{
 			Name:        "p, password",
-			Usage:       "Password to use when connecting to server.",
+			Usage:       "password to use when connecting to server",
 			Destination: &c.Password,
 		},
 		cli.StringFlag{
 			Name:        "d, db",
-			Usage:       "Database name.",
+			Usage:       "database name",
 			Destination: &c.DB,
 		},
 		cli.StringFlag{
 			Name:  "V, viewer",
 			Value: txt.Name,
 			Usage: fmt.Sprintf(
-				"Output viewer. Optional values: %s",
+				"output viewer. Optional values: %s",
 				strings.Join(view.Registered(), "|"),
 			),
 			Destination: &c.Viewer,
 		},
 		cli.StringFlag{
 			Name:        "o, output",
-			Usage:       "Write to a file, instead of STDOUT.",
+			Usage:       "write to a file, instead of STDOUT",
 			Destination: &c.Output,
 		},
 		cli.BoolFlag{
 			Name:        "D, debug",
-			Usage:       "Enable debug mode.",
+			Usage:       "enable debug mode",
 			Destination: &c.Debug,
 		},
 	}
