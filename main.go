@@ -14,6 +14,7 @@ import (
 	"github.com/voidint/tsdump/model/mysql"
 	"github.com/voidint/tsdump/view"
 	"github.com/voidint/tsdump/view/txt"
+	"golang.org/x/crypto/ssh/terminal"
 
 	_ "github.com/voidint/tsdump/view/csv"
 	_ "github.com/voidint/tsdump/view/json"
@@ -69,11 +70,6 @@ func main() {
 			Destination: &c.Username,
 		},
 		cli.StringFlag{
-			Name:        "p, password",
-			Usage:       "password to use when connecting to server",
-			Destination: &c.Password,
-		},
-		cli.StringFlag{
 			Name:        "d, db",
 			Usage:       "database name",
 			Destination: &c.DB,
@@ -98,7 +94,13 @@ func main() {
 			Destination: &c.Debug,
 		},
 	}
-	app.Action = func(ctx *cli.Context) error {
+	app.Action = func(ctx *cli.Context) (err error) {
+		var passwd []byte
+		if passwd, err = readPassword(); err != nil {
+			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
+		}
+		c.Password = string(passwd)
+
 		repo, err := mysql.NewRepo(&c)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
@@ -141,4 +143,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, fmt.Sprintf("[tsdump] %s", err.Error()))
 		os.Exit(1)
 	}
+}
+
+// readPassword 从stdin读取密码
+func readPassword() (passwd []byte, err error) {
+	fmt.Print("Enter Password: ")
+	return terminal.ReadPassword(int(os.Stdin.Fd()))
 }
