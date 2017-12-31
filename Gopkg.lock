@@ -57,7 +57,7 @@
 
 [[projects]]
   name = "github.com/smartystreets/goconvey"
-  packages = [".","convey/gotest","convey/reporting","web/server/api","web/server/contract","web/server/executor","web/server/messaging","web/server/parser","web/server/system","web/server/watch"]
+  packages = ["convey","convey/gotest","convey/reporting"]
   revision = "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
   version = "1.6.3"
 
@@ -67,9 +67,21 @@
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "95a4943f35d008beabde8c11e5075a1b714e6419"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix","windows"]
+  revision = "83801418e1b59fb1880e363299581ee543af32ca"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "87deaafdd3b9ebd80ef6a19c748388faaa6660d6ef40ad27c4936f122124bb61"
+  inputs-digest = "a5ec104891a02624234b1a9c2f30ea6f33de903f2da4a0d8c6cbe5f03fbffa98"
   solver-name = "gps-cdcl"
   solver-version = 1
