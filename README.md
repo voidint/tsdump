@@ -21,16 +21,14 @@ $ go get -u github.com/voidint/tsdump
 - 全局选项
 ```shell
 GLOBAL OPTIONS:
-   -H value, --host value      Connect to host. (default: "127.0.0.1")
-   -P value, --port value      Port number to use for connection. (default: 3306)
-   -u value, --user value      User for login if not current user. (default: "voidint")
-   -p value, --password value  Password to use when connecting to server.
-   -d value, --db value        Database name.
-   -V value, --viewer value    Output viewer. Optional values: txt|csv|json|md (default: "txt")
-   -o value, --output value    Write to a file, instead of STDOUT.
-   -D, --debug                 Enable debug mode.
-   --help, -h                  show help
-   --version, -v               print the version
+   -D, --debug               enable debug mode
+   -H value, --host value    connect to host (default: "127.0.0.1")
+   -P value, --port value    port number to use for connection (default: 3306)
+   -u value, --user value    user for login if not current user (default: "voidint")
+   -V value, --viewer value  output viewer. Optional values: txt|csv|json|md (default: "txt")
+   -o value, --output value  write to a file, instead of STDOUT
+   --help, -h                show help
+   --version, -v             print the version
 ```
 
 - 使用`root`用户创建一个名为`mydb`的数据库实例，以及一张`student`的表。
@@ -55,9 +53,10 @@ GLOBAL OPTIONS:
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学生信息表';
     ```
 
-- 将数据库及其表结构数据以表格形式输出到console
+- 将目标数据库及其所有表的表结构数据以表格形式输出到console
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -p "mypassword" --db mydb
+    $ tsdump -H 127.0.0.1 -P 3307 -u root mydb
+    Enter Password:
     |----------|---------------|--------------------|
     | DATABASE | CHARACTER SET |     COLLATION      |
     |----------|---------------|--------------------|
@@ -82,9 +81,9 @@ GLOBAL OPTIONS:
     |----------|--------------|----------|-----|---------|---------------|--------------------|----------|
     ```
 
-- 将数据库及其表结构数据输出到markdown文件
+- 将目标数据库下目标表的表结构数据输出到markdown文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -p "mypassword" --db mydb -V md > ./mydb.md
+    $ tsdump -H 127.0.0.1 -P 3307 -u root -V md -o ./student.md mydb student
     ```
 
     output: 
@@ -110,14 +109,14 @@ GLOBAL OPTIONS:
     | home     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 家庭住址 |
     | tell     | varchar(40)  | YES      |     |         | utf8mb4       | utf8mb4_general_ci | 联系电话 |
 
-- 将数据库及其表结构数据输出到csv文件
+- 将用户权限范围内数据库及其表结构数据输出到csv文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -p "mypassword" --db mydb -V csv -o ./mydb.csv
+    $ tsdump -H 127.0.0.1 -P 3307 -u root -V csv -o ./mydb.csv
     ```
 
-- 将数据库及其表结构数据输出到JSON文件
+- 将目标数据库及其所有表的表结构数据输出到JSON文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -p "mypassword" --db mydb -V json -o ./mydb.json
+    $ tsdump -H 127.0.0.1 -P 3307 -u root -V json -o mydb.json mydb
     ```
 
 ## Changelog
@@ -129,3 +128,4 @@ GLOBAL OPTIONS:
 
 ### 0.2.0 - 
 - 支持从stdin console中读取数据库登录密码。[#5](https://github.com/voidint/tsdump/issues/5)
+- 支持命令行参数指定目标数据库和表。[#12](https://github.com/voidint/tsdump/issues/12)
