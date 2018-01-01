@@ -42,7 +42,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
-	app.Version = build.Version("0.1.0")
+	app.Version = build.Version("0.2.0")
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "voidnt",
