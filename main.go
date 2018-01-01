@@ -39,6 +39,11 @@ var (
 )
 
 func main() {
+	cli.HelpFlag = cli.BoolFlag{
+		Name:  "help",
+		Usage: "show help",
+	}
+
 	app := cli.NewApp()
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
@@ -57,7 +62,7 @@ func main() {
 			Destination: &c.Debug,
 		},
 		cli.StringFlag{
-			Name:        "H, host",
+			Name:        "h, host",
 			Value:       "127.0.0.1",
 			Usage:       "connect to host",
 			Destination: &c.Host,
