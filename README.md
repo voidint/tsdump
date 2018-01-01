@@ -18,17 +18,32 @@ $ go get -u github.com/voidint/tsdump
 ```
 
 ## 基本使用
-- 全局选项
+
 ```shell
-GLOBAL OPTIONS:
-   -D, --debug               enable debug mode
-   -H value, --host value    connect to host (default: "127.0.0.1")
-   -P value, --port value    port number to use for connection (default: 3306)
-   -u value, --user value    user for login if not current user (default: "voidint")
-   -V value, --viewer value  output viewer. Optional values: txt|csv|json|md (default: "txt")
-   -o value, --output value  write to a file, instead of STDOUT
-   --help, -h                show help
-   --version, -v             print the version
+NAME:
+  tsdump - Database table structure dump tool.
+
+USAGE:
+  tsdump [OPTIONS] [database [table ...]]
+
+VERSION:
+  0.2.0
+
+AUTHOR:
+  voidnt <voidint@126.com>
+
+OPTIONS:
+  -D, --debug               enable debug mode
+  -h value, --host value    connect to host (default: "127.0.0.1")
+  -P value, --port value    port number to use for connection (default: 3306)
+  -u value, --user value    user for login if not current user (default: "voidint")
+  -V value, --viewer value  output viewer. Optional values: txt|csv|json|md (default: "txt")
+  -o value, --output value  write to a file, instead of STDOUT
+  --help                    show help
+  --version, -v             print the version
+
+COPYRIGHT:
+  Copyright (c) 2017, 2018, voidint. All rights reserved.
 ```
 
 - 使用`root`用户创建一个名为`mydb`的数据库实例，以及一张`student`的表。
@@ -55,7 +70,7 @@ GLOBAL OPTIONS:
 
 - 将目标数据库及其所有表的表结构数据以表格形式输出到console
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root mydb
+    $ tsdump -h 127.0.0.1 -P 3307 -u root mydb
     Enter Password:
     |----------|---------------|--------------------|
     | DATABASE | CHARACTER SET |     COLLATION      |
@@ -83,7 +98,7 @@ GLOBAL OPTIONS:
 
 - 将目标数据库下目标表的表结构数据输出到markdown文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -V md -o ./student.md mydb student
+    $ tsdump -h 127.0.0.1 -P 3307 -u root -V md -o ./student.md mydb student
     ```
 
     output: 
@@ -111,12 +126,12 @@ GLOBAL OPTIONS:
 
 - 将用户权限范围内数据库及其表结构数据输出到csv文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -V csv -o ./mydb.csv
+    $ tsdump -h 127.0.0.1 -P 3307 -u root -V csv -o ./mydb.csv
     ```
 
 - 将目标数据库及其所有表的表结构数据输出到JSON文件
     ```shell
-    $ tsdump -H 127.0.0.1 -P 3307 -u root -V json -o mydb.json mydb
+    $ tsdump -h 127.0.0.1 -P 3307 -u root -V json -o mydb.json mydb
     ```
 
 ## Changelog
@@ -126,6 +141,8 @@ GLOBAL OPTIONS:
 - 支持以`text`视图方式导出表结构数据。[#3](https://github.com/voidint/tsdump/issues/3)
 - 支持以`json`视图方式导出表结构数据。[#4](https://github.com/voidint/tsdump/issues/4)
 
-### 0.2.0 - 
+### 0.2.0 - 2018/01/01
 - 支持从stdin console中读取数据库登录密码。[#5](https://github.com/voidint/tsdump/issues/5)
+- 修正help信息。[#6](https://github.com/voidint/tsdump/issues/6)
 - 支持命令行参数指定目标数据库和表。[#12](https://github.com/voidint/tsdump/issues/12)
+- 支持通过`-h`选项指定主机名。[#14](https://github.com/voidint/tsdump/issues/14)

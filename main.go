@@ -22,32 +22,55 @@ import (
 	_ "github.com/voidint/tsdump/view/txt"
 )
 
+const shortVersion = "0.2.0"
+
 var (
 	username string
+	c        config.Config
+	out      io.Writer = os.Stdout
 )
 
 func init() {
+	cli.HelpFlag = cli.BoolFlag{
+		Name:  "help",
+		Usage: "show help",
+	}
+
+	cli.AppHelpTemplate = fmt.Sprintf(`NAME:
+	{{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
+
+USAGE:
+	{{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} {{if .VisibleFlags}}[OPTIONS]{{end}} [database [table ...]]{{end}}{{if .Version}}{{if not .HideVersion}}
+
+VERSION:
+	%s{{end}}{{end}}{{if .Description}}
+
+DESCRIPTION:
+	{{.Description}}{{end}}{{if len .Authors}}
+
+AUTHOR{{with $length := len .Authors}}{{if ne 1 $length}}S{{end}}{{end}}:
+	{{range $index, $author := .Authors}}{{if $index}}
+	{{end}}{{$author}}{{end}}{{end}}{{if .VisibleFlags}}
+
+OPTIONS:
+	{{range $index, $option := .VisibleFlags}}{{if $index}}
+	{{end}}{{$option}}{{end}}{{end}}{{if .Copyright}}
+
+COPYRIGHT:
+	{{.Copyright}}{{end}}
+`, shortVersion)
+
 	u, err := user.Current()
 	if err == nil {
 		username = u.Username
 	}
 }
 
-var (
-	c   config.Config
-	out io.Writer = os.Stdout
-)
-
 func main() {
-	cli.HelpFlag = cli.BoolFlag{
-		Name:  "help",
-		Usage: "show help",
-	}
-
 	app := cli.NewApp()
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
-	app.Version = build.Version("0.2.0")
+	app.Version = build.Version(shortVersion)
 	app.Copyright = "Copyright (c) 2017, 2018, voidint. All rights reserved."
 	app.Authors = []cli.Author{
 		cli.Author{
