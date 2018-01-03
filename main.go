@@ -104,6 +104,11 @@ func main() {
 			Destination: &c.Username,
 		},
 		cli.StringFlag{
+			Name:        "p, password",
+			Usage:       "password to use when connecting to server. If password is not given it's solicited on the tty.",
+			Destination: &c.Password,
+		},
+		cli.StringFlag{
 			Name:  "V, viewer",
 			Value: txt.Name,
 			Usage: fmt.Sprintf(
@@ -125,11 +130,13 @@ func main() {
 			c.Tables = args.Tail()
 		}
 
-		var passwd []byte
-		if passwd, err = readPassword(); err != nil {
-			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
+		if c.Password == "" {
+			var passwd []byte
+			if passwd, err = readPassword(); err != nil {
+				return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
+			}
+			c.Password = string(passwd)
 		}
-		c.Password = string(passwd)
 		return nil
 	}
 

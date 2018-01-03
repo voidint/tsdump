@@ -20,6 +20,7 @@ $ go get -u github.com/voidint/tsdump
 ## 基本使用
 
 ```shell
+$ tsdump --help
 NAME:
   tsdump - Database table structure dump tool.
 
@@ -33,14 +34,15 @@ AUTHOR:
   voidnt <voidint@126.com>
 
 OPTIONS:
-  -D, --debug               enable debug mode
-  -h value, --host value    connect to host (default: "127.0.0.1")
-  -P value, --port value    port number to use for connection (default: 3306)
-  -u value, --user value    user for login if not current user (default: "voidint")
-  -V value, --viewer value  output viewer. Optional values: txt|csv|json|md (default: "txt")
-  -o value, --output value  write to a file, instead of STDOUT
-  --help                    show help
-  --version, -v             print the version
+  -D, --debug                 enable debug mode
+  -h value, --host value      connect to host (default: "127.0.0.1")
+  -P value, --port value      port number to use for connection (default: 3306)
+  -u value, --user value      user for login if not current user (default: "voidint")
+  -p value, --password value  password to use when connecting to server. If password is not given it's solicited on the tty.
+  -V value, --viewer value    output viewer. Optional values: md|txt|csv|json (default: "txt")
+  -o value, --output value    write to a file, instead of STDOUT
+  --help                      show help
+  --version, -v               print the version
 
 COPYRIGHT:
   Copyright (c) 2017, 2018, voidint. All rights reserved.
@@ -135,6 +137,9 @@ COPYRIGHT:
     ```
 
 ## Changelog
+### 0.3.0 - 
+- 支持通过`-p`选项指定数据库登录密码。[#16](https://github.com/voidint/tsdump/issues/16)
+
 ### 0.1.0 - 2017/12/31
 - 支持以`csv`视图方式导出表结构数据。[#1](https://github.com/voidint/tsdump/issues/1)
 - 支持以`markdown`视图方式导出表结构数据。[#2](https://github.com/voidint/tsdump/issues/2)
