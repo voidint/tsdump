@@ -131,11 +131,9 @@ func main() {
 		}
 
 		if c.Password == "" {
-			var passwd []byte
-			if passwd, err = readPassword(); err != nil {
+			if c.Password, err = readPassword("Enter Password: "); err != nil {
 				return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
 			}
-			c.Password = string(passwd)
 		}
 		return nil
 	}
@@ -179,10 +177,13 @@ func main() {
 }
 
 // readPassword 从stdin读取密码
-func readPassword() (passwd []byte, err error) {
-	defer fmt.Println()
-	fmt.Print("Enter Password: ")
-	return terminal.ReadPassword(int(os.Stdin.Fd()))
+func readPassword(prompt string) (passwd string, err error) {
+	state, err := terminal.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		return "", err
+	}
+	defer terminal.Restore(int(os.Stdin.Fd()), state)
+	return terminal.NewTerminal(os.Stdin, "").ReadPassword(prompt)
 }
 
 // getMetadata 根据目标数据库名和表名，返回目标数据库及其表的元数据。
