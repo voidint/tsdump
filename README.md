@@ -137,7 +137,7 @@ COPYRIGHT:
     ```
 
 ## Changelog
-### 0.3.0 - 
+### 0.3.0 - 2018/01/05
 - `Add feature`: 支持通过`-p`选项指定数据库登录密码。[#16](https://github.com/voidint/tsdump/issues/16)
 - `Fixbug`: 标准输出重定向后获得的内容中包含有`Enter Password:`字样。[#17](https://github.com/voidint/tsdump/issues/17)
 
