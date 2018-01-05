@@ -28,7 +28,7 @@ USAGE:
   tsdump [OPTIONS] [database [table ...]]
 
 VERSION:
-  0.2.0
+  0.3.0
 
 AUTHOR:
   voidnt <voidint@126.com>
@@ -39,7 +39,7 @@ OPTIONS:
   -P value, --port value      port number to use for connection (default: 3306)
   -u value, --user value      user for login if not current user (default: "voidint")
   -p value, --password value  password to use when connecting to server. If password is not given it's solicited on the tty.
-  -V value, --viewer value    output viewer. Optional values: md|txt|csv|json (default: "txt")
+  -V value, --viewer value    output viewer. Optional values: txt|csv|json|md (default: "txt")
   -o value, --output value    write to a file, instead of STDOUT
   --help                      show help
   --version, -v               print the version
@@ -128,18 +128,18 @@ COPYRIGHT:
 
 - 将用户权限范围内数据库及其表结构数据输出到csv文件
     ```shell
-    $ tsdump -h 127.0.0.1 -P 3307 -u root -V csv -o ./mydb.csv
+    $ tsdump -h 127.0.0.1 -P 3307 -u root -V csv > ./mydb.csv
     ```
 
 - 将目标数据库及其所有表的表结构数据输出到JSON文件
     ```shell
-    $ tsdump -h 127.0.0.1 -P 3307 -u root -V json -o mydb.json mydb
+    $ tsdump -h 127.0.0.1 -P 3307 -u root -V json mydb > mydb.json
     ```
 
 ## Changelog
 ### 0.3.0 - 
 - `Add feature`: 支持通过`-p`选项指定数据库登录密码。[#16](https://github.com/voidint/tsdump/issues/16)
-- `Fixbug`: 标准重定向后获得的内容中包含有`Enter Password:`字样。[#17](https://github.com/voidint/tsdump/issues/17)
+- `Fixbug`: 标准输出重定向后获得的内容中包含有`Enter Password:`字样。[#17](https://github.com/voidint/tsdump/issues/17)
 
 ### 0.2.0 - 2018/01/01
 - `Add feature`: 支持从stdin console中读取数据库登录密码。[#5](https://github.com/voidint/tsdump/issues/5)
