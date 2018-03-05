@@ -4,6 +4,7 @@ package config
 type Config struct {
 	Host     string
 	Port     int
+	Socket   string
 	Username string
 	Password string
 	DB       string

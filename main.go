@@ -98,6 +98,11 @@ func main() {
 			Destination: &c.Port,
 		},
 		cli.StringFlag{
+			Name:        "S, socket",
+			Usage:       "socket file to use for connection",
+			Destination: &c.Socket,
+		},
+		cli.StringFlag{
 			Name:        "u, user",
 			Value:       username,
 			Usage:       "user for login if not current user",

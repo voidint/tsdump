@@ -14,17 +14,24 @@ type Repo struct {
 	engine *xorm.Engine
 }
 
+func genDataSource(c *config.Config, params string) (dataSource string) {
+	if c.Socket == "" {
+		// use tcp protocol
+		if c.Password == "" {
+			return fmt.Sprintf("%s@tcp(%s:%d)/information_schema?%s", c.Username, c.Host, c.Port, params)
+		}
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/information_schema?%s", c.Username, c.Password, c.Host, c.Port, params)
+	}
+	// use unix domain socket protocol
+	if c.Password == "" {
+		return fmt.Sprintf("%s@unix(%s)/information_schema?%s", c.Username, c.Socket, params)
+	}
+	return fmt.Sprintf("%s:%s@unix(%s)/information_schema?%s", c.Username, c.Password, c.Socket, params)
+}
+
 // NewRepo 实例化
 func NewRepo(c *config.Config) (model.IRepo, error) {
-	engine, err := xorm.NewEngine("mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true&loc=Local",
-			c.Username,
-			c.Password,
-			c.Host,
-			c.Port,
-			"information_schema",
-		),
-	)
+	engine, err := xorm.NewEngine("mysql", genDataSource(c, "charset=utf8&parseTime=true&loc=Local"))
 	if err != nil {
 		return nil, err
 	}
