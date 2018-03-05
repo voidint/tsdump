@@ -136,7 +136,11 @@ COPYRIGHT:
     $ tsdump -h 127.0.0.1 -P 3307 -u root -V json mydb > mydb.json
     ```
 
+
 ## Changelog
+### 0.4.0 - 
+- `Add feature`: 支持`UNIX Domain Socket`方式连接数据库。[#18](https://github.com/voidint/tsdump/issues/18)
+
 ### 0.3.0 - 2018/01/05
 - `Add feature`: 支持通过`-p`选项指定数据库登录密码。[#16](https://github.com/voidint/tsdump/issues/16)
 - `Fixbug`: 标准输出重定向后获得的内容中包含有`Enter Password:`字样。[#17](https://github.com/voidint/tsdump/issues/17)
