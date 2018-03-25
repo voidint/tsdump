@@ -138,8 +138,9 @@ COPYRIGHT:
 
 
 ## Changelog
-### 0.4.0 - 
+### 0.4.0 - 2018/03/25
 - `Add feature`: 支持`UNIX Domain Socket`方式连接数据库。[#18](https://github.com/voidint/tsdump/issues/18)
+- `Modify feature`: 优化JSON视图输出格式。[#19](https://github.com/voidint/tsdump/issues/19)
 
 ### 0.3.0 - 2018/01/05
 - `Add feature`: 支持通过`-p`选项指定数据库登录密码。[#16](https://github.com/voidint/tsdump/issues/16)
