@@ -9,36 +9,36 @@ var (
 
 // DB 数据库实例元信息
 type DB struct {
-	Name      string
-	CharSet   string
-	Collation string
-	Tables    []Table
-	Extra     map[string]string
+	Name      string            `json:"name,omitempty"`
+	CharSet   string            `json:"charset,omitempty"`
+	Collation string            `json:"collation,omitempty"`
+	Tables    []Table           `json:"tables,omitempty"`
+	Extra     map[string]string `json:"extra,omitempty"`
 }
 
 // Table 表元信息
 type Table struct {
-	DB        string
-	Name      string
-	Collation string
-	Comment   string
-	Columns   []Column
-	Extra     map[string]string
+	DB        string            `json:"-"`
+	Name      string            `json:"name,omitempty"`
+	Collation string            `json:"collation,omitempty"`
+	Comment   string            `json:"comment,omitempty"`
+	Columns   []Column          `json:"columns,omitempty"`
+	Extra     map[string]string `json:"extra,omitempty"`
 }
 
 // Column 列元信息
 type Column struct {
-	DB        string
-	Table     string
-	Name      string
-	Default   string
-	Nullable  string
-	DataType  string
-	Key       string
-	CharSet   string
-	Collation string
-	Comment   string
-	Extra     map[string]string
+	DB        string            `json:"-"`
+	Table     string            `json:"-"`
+	Name      string            `json:"name,omitempty"`
+	Default   string            `json:"default,omitempty"`
+	Nullable  string            `json:"nullable,omitempty"`
+	DataType  string            `json:"data_type,omitempty"`
+	Key       string            `json:"key,omitempty"`
+	CharSet   string            `json:"charset,omitempty"`
+	Collation string            `json:"collation,omitempty"`
+	Comment   string            `json:"comment,omitempty"`
+	Extra     map[string]string `json:"extra,omitempty"`
 }
 
 // IRepo 数据库元信息查询接口
