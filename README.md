@@ -19,7 +19,7 @@
   ```
 - 二进制安装
 
-  [Download]((https://github.com/voidint/tsdump/releases))
+  [Download](https://github.com/voidint/tsdump/releases)
 
 ## 基本使用
 
