@@ -13,9 +13,13 @@
 
 
 ## 安装
-```shell
-$ go get -u github.com/voidint/tsdump
-```
+- 源代码安装
+  ```shell
+  $ go get -u github.com/voidint/tsdump
+  ```
+- 二进制安装
+
+  [Download]((https://github.com/voidint/tsdump/releases))
 
 ## 基本使用
 
