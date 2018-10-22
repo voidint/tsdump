@@ -1,6 +1,6 @@
 {
-    "version": "0.5.0",
-    "tool": "go install -ldflags='-s -w'",
+    "version": "0.6.0",
+    "tool": "go build -ldflags='-s -w'",
     "importpath": "github.com/voidint/tsdump/build",
     "variables": [
         {
