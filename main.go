@@ -71,7 +71,7 @@ func main() {
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
 	app.Version = build.Version(shortVersion)
-	app.Copyright = "Copyright (c) 2017, 2018, voidint. All rights reserved."
+	app.Copyright = "Copyright (c) 2017, 2019, voidint. All rights reserved."
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "voidnt",
