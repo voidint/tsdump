@@ -12,14 +12,14 @@ import (
 	"github.com/go-xorm/core"
 )
 
-func (session *Session) cacheDelete(sqlStr string, args ...interface{}) error {
-	if session.statement.RefTable == nil ||
+func (session *Session) cacheDelete(table *core.Table, tableName, sqlStr string, args ...interface{}) error {
+	if table == nil ||
 		session.tx != nil {
 		return ErrCacheFailed
 	}
 
 	for _, filter := range session.engine.dialect.Filters() {
-		sqlStr = filter.Do(sqlStr, session.engine.dialect, session.statement.RefTable)
+		sqlStr = filter.Do(sqlStr, session.engine.dialect, table)
 	}
 
 	newsql := session.statement.convertIDSQL(sqlStr)
@@ -27,11 +27,11 @@ func (session *Session) cacheDelete(sqlStr string, args ...interface{}) error {
 		return ErrCacheFailed
 	}
 
-	cacher := session.engine.getCacher2(session.statement.RefTable)
-	tableName := session.statement.TableName()
+	cacher := session.engine.getCacher(tableName)
+	pkColumns := table.PKColumns()
 	ids, err := core.GetCacheSql(cacher, tableName, newsql, args)
 	if err != nil {
-		resultsSlice, err := session.query(newsql, args...)
+		resultsSlice, err := session.queryBytes(newsql, args...)
 		if err != nil {
 			return err
 		}
@@ -40,7 +40,7 @@ func (session *Session) cacheDelete(sqlStr string, args ...interface{}) error {
 			for _, data := range resultsSlice {
 				var id int64
 				var pk core.PK = make([]interface{}, 0)
-				for _, col := range session.statement.RefTable.PKColumns() {
+				for _, col := range pkColumns {
 					if v, ok := data[col.Name]; !ok {
 						return errors.New("no id")
 					} else if col.SQLType.IsText() {
@@ -58,35 +58,30 @@ func (session *Session) cacheDelete(sqlStr string, args ...interface{}) error {
 				ids = append(ids, pk)
 			}
 		}
-	} /*else {
-	    session.engine.LogDebug("delete cache sql %v", newsql)
-	    cacher.DelIds(tableName, genSqlKey(newsql, args))
-	}*/
+	}
 
 	for _, id := range ids {
-		session.engine.logger.Debug("[cacheDelete] delete cache obj", tableName, id)
+		session.engine.logger.Debug("[cacheDelete] delete cache obj:", tableName, id)
 		sid, err := id.ToString()
 		if err != nil {
 			return err
 		}
 		cacher.DelBean(tableName, sid)
 	}
-	session.engine.logger.Debug("[cacheDelete] clear cache sql", tableName)
+	session.engine.logger.Debug("[cacheDelete] clear cache table:", tableName)
 	cacher.ClearIds(tableName)
 	return nil
 }
 
 // Delete records, bean's non-empty fields are conditions
 func (session *Session) Delete(bean interface{}) (int64, error) {
-	defer session.resetStatement()
 	if session.isAutoClose {
 		defer session.Close()
 	}
 
-	if err := session.statement.setRefValue(rValue(bean)); err != nil {
+	if err := session.statement.setRefBean(bean); err != nil {
 		return 0, err
 	}
-	var table = session.statement.RefTable
 
 	// handle before delete processors
 	for _, closure := range session.beforeClosures {
@@ -106,7 +101,9 @@ func (session *Session) Delete(bean interface{}) (int64, error) {
 		return 0, ErrNeedDeletedCond
 	}
 
-	var tableName = session.engine.Quote(session.statement.TableName())
+	var tableNameNoQuote = session.statement.TableName()
+	var tableName = session.engine.Quote(tableNameNoQuote)
+	var table = session.statement.RefTable
 	var deleteSQL string
 	if len(condSQL) > 0 {
 		deleteSQL = fmt.Sprintf("DELETE FROM %v WHERE %v", tableName, condSQL)
@@ -187,12 +184,12 @@ func (session *Session) Delete(bean interface{}) (int64, error) {
 			}
 		}
 
-		// !oinume! Insert NowTime to the head of session.statement.Params
+		// !oinume! Insert nowTime to the head of session.statement.Params
 		condArgs = append(condArgs, "")
 		paramsLen := len(condArgs)
 		copy(condArgs[1:paramsLen], condArgs[0:paramsLen-1])
 
-		val, t := session.engine.NowTime2(deletedColumn.SQLType.Name)
+		val, t := session.engine.nowTime(deletedColumn)
 		condArgs[0] = val
 
 		var colName = deletedColumn.Name
@@ -202,10 +199,11 @@ func (session *Session) Delete(bean interface{}) (int64, error) {
 		})
 	}
 
-	if cacher := session.engine.getCacher2(session.statement.RefTable); cacher != nil && session.statement.UseCache {
-		session.cacheDelete(deleteSQL, argsForCache...)
+	if cacher := session.engine.getCacher(tableName); cacher != nil && session.statement.UseCache {
+		session.cacheDelete(table, tableNameNoQuote, deleteSQL, argsForCache...)
 	}
 
+	session.statement.RefTable = table
 	res, err := session.exec(realSQL, condArgs...)
 	if err != nil {
 		return 0, err

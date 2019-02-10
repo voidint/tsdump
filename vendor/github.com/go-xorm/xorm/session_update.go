@@ -15,8 +15,8 @@ import (
 	"github.com/go-xorm/core"
 )
 
-func (session *Session) cacheUpdate(sqlStr string, args ...interface{}) error {
-	if session.statement.RefTable == nil ||
+func (session *Session) cacheUpdate(table *core.Table, tableName, sqlStr string, args ...interface{}) error {
+	if table == nil ||
 		session.tx != nil {
 		return ErrCacheFailed
 	}
@@ -26,7 +26,7 @@ func (session *Session) cacheUpdate(sqlStr string, args ...interface{}) error {
 		return ErrCacheFailed
 	}
 	for _, filter := range session.engine.dialect.Filters() {
-		newsql = filter.Do(newsql, session.engine.dialect, session.statement.RefTable)
+		newsql = filter.Do(newsql, session.engine.dialect, table)
 	}
 	session.engine.logger.Debug("[cacheUpdate] new sql", oldhead, newsql)
 
@@ -39,13 +39,12 @@ func (session *Session) cacheUpdate(sqlStr string, args ...interface{}) error {
 			nStart = strings.Count(oldhead, "$")
 		}
 	}
-	table := session.statement.RefTable
-	cacher := session.engine.getCacher2(table)
-	tableName := session.statement.TableName()
+
+	cacher := session.engine.getCacher(tableName)
 	session.engine.logger.Debug("[cacheUpdate] get cache sql", newsql, args[nStart:])
 	ids, err := core.GetCacheSql(cacher, tableName, newsql, args[nStart:])
 	if err != nil {
-		rows, err := session.DB().Query(newsql, args[nStart:]...)
+		rows, err := session.NoCache().queryRows(newsql, args[nStart:]...)
 		if err != nil {
 			return err
 		}
@@ -144,7 +143,6 @@ func (session *Session) cacheUpdate(sqlStr string, args ...interface{}) error {
 //         You should call UseBool if you have bool to use.
 //        2.float32 & float64 may be not inexact as conditions
 func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int64, error) {
-	defer session.resetStatement()
 	if session.isAutoClose {
 		defer session.Close()
 	}
@@ -169,7 +167,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 	var isMap = t.Kind() == reflect.Map
 	var isStruct = t.Kind() == reflect.Struct
 	if isStruct {
-		if err := session.statement.setRefValue(v); err != nil {
+		if err := session.statement.setRefBean(bean); err != nil {
 			return 0, err
 		}
 
@@ -178,12 +176,10 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		}
 
 		if session.statement.ColumnStr == "" {
-			colNames, args = buildUpdates(session.engine, session.statement.RefTable, bean, false, false,
-				false, false, session.statement.allUseBool, session.statement.useAllCols,
-				session.statement.mustColumnMap, session.statement.nullableMap,
-				session.statement.columnMap, true, session.statement.unscoped)
+			colNames, args = session.statement.buildUpdates(bean, false, false,
+				false, false, true)
 		} else {
-			colNames, args, err = genCols(session.statement.RefTable, session, bean, true, true)
+			colNames, args, err = session.genUpdateColumns(bean)
 			if err != nil {
 				return 0, err
 			}
@@ -204,17 +200,20 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 	table := session.statement.RefTable
 
 	if session.statement.UseAutoTime && table != nil && table.Updated != "" {
-		colNames = append(colNames, session.engine.Quote(table.Updated)+" = ?")
-		col := table.UpdatedColumn()
-		val, t := session.engine.NowTime2(col.SQLType.Name)
-		args = append(args, val)
+		if !session.statement.columnMap.contain(table.Updated) &&
+			!session.statement.omitColumnMap.contain(table.Updated) {
+			colNames = append(colNames, session.engine.Quote(table.Updated)+" = ?")
+			col := table.UpdatedColumn()
+			val, t := session.engine.nowTime(col)
+			args = append(args, val)
 
-		var colName = col.Name
-		if isStruct {
-			session.afterClosures = append(session.afterClosures, func(bean interface{}) {
-				col := table.GetColumn(colName)
-				setColumnTime(bean, col, t)
-			})
+			var colName = col.Name
+			if isStruct {
+				session.afterClosures = append(session.afterClosures, func(bean interface{}) {
+					col := table.GetColumn(colName)
+					setColumnTime(bean, col, t)
+				})
+			}
 		}
 	}
 
@@ -242,15 +241,27 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 
 	var autoCond builder.Cond
 	if !session.statement.noAutoCondition && len(condiBean) > 0 {
-		var err error
-		autoCond, err = session.statement.buildConds(session.statement.RefTable, condiBean[0], true, true, false, true, false)
-		if err != nil {
-			return 0, err
+		if c, ok := condiBean[0].(map[string]interface{}); ok {
+			autoCond = builder.Eq(c)
+		} else {
+			ct := reflect.TypeOf(condiBean[0])
+			k := ct.Kind()
+			if k == reflect.Ptr {
+				k = ct.Elem().Kind()
+			}
+			if k == reflect.Struct {
+				var err error
+				autoCond, err = session.statement.buildConds(session.statement.RefTable, condiBean[0], true, true, false, true, false)
+				if err != nil {
+					return 0, err
+				}
+			} else {
+				return 0, ErrConditionType
+			}
 		}
 	}
 
-	st := session.statement
-	defer session.resetStatement()
+	st := &session.statement
 
 	var sqlStr string
 	var condArgs []interface{}
@@ -282,6 +293,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		condSQL = condSQL + fmt.Sprintf(" ORDER BY %v", st.OrderStr)
 	}
 
+	var tableName = session.statement.TableName()
 	// TODO: Oracle support needed
 	var top string
 	if st.LimitN > 0 {
@@ -290,7 +302,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		} else if st.Engine.dialect.DBType() == core.SQLITE {
 			tempCondSQL := condSQL + fmt.Sprintf(" LIMIT %d", st.LimitN)
 			cond = cond.And(builder.Expr(fmt.Sprintf("rowid IN (SELECT rowid FROM %v %v)",
-				session.engine.Quote(session.statement.TableName()), tempCondSQL), condArgs...))
+				session.engine.Quote(tableName), tempCondSQL), condArgs...))
 			condSQL, condArgs, err = builder.ToSQL(cond)
 			if err != nil {
 				return 0, err
@@ -301,7 +313,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		} else if st.Engine.dialect.DBType() == core.POSTGRES {
 			tempCondSQL := condSQL + fmt.Sprintf(" LIMIT %d", st.LimitN)
 			cond = cond.And(builder.Expr(fmt.Sprintf("CTID IN (SELECT CTID FROM %v %v)",
-				session.engine.Quote(session.statement.TableName()), tempCondSQL), condArgs...))
+				session.engine.Quote(tableName), tempCondSQL), condArgs...))
 			condSQL, condArgs, err = builder.ToSQL(cond)
 			if err != nil {
 				return 0, err
@@ -315,7 +327,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 				table != nil && len(table.PrimaryKeys) == 1 {
 				cond = builder.Expr(fmt.Sprintf("%s IN (SELECT TOP (%d) %s FROM %v%v)",
 					table.PrimaryKeys[0], st.LimitN, table.PrimaryKeys[0],
-					session.engine.Quote(session.statement.TableName()), condSQL), condArgs...)
+					session.engine.Quote(tableName), condSQL), condArgs...)
 
 				condSQL, condArgs, err = builder.ToSQL(cond)
 				if err != nil {
@@ -336,7 +348,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 
 	sqlStr = fmt.Sprintf("UPDATE %v%v SET %v %v",
 		top,
-		session.engine.Quote(session.statement.TableName()),
+		session.engine.Quote(tableName),
 		strings.Join(colNames, ", "),
 		condSQL)
 
@@ -349,11 +361,11 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		}
 	}
 
-	if table != nil {
-		if cacher := session.engine.getCacher2(table); cacher != nil && session.statement.UseCache {
-			cacher.ClearIds(session.statement.TableName())
-			cacher.ClearBeans(session.statement.TableName())
-		}
+	if cacher := session.engine.getCacher(tableName); cacher != nil && session.statement.UseCache {
+		//session.cacheUpdate(table, tableName, sqlStr, args...)
+		session.engine.logger.Debug("[cacheUpdate] clear table ", tableName)
+		cacher.ClearIds(tableName)
+		cacher.ClearBeans(tableName)
 	}
 
 	// handle after update processors
@@ -362,7 +374,7 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 			closure(bean)
 		}
 		if processor, ok := interface{}(bean).(AfterUpdateProcessor); ok {
-			session.engine.logger.Debug("[event]", session.statement.TableName(), " has after update processor")
+			session.engine.logger.Debug("[event]", tableName, " has after update processor")
 			processor.AfterUpdate()
 		}
 	} else {
@@ -387,4 +399,93 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 	// --
 
 	return res.RowsAffected()
+}
+
+func (session *Session) genUpdateColumns(bean interface{}) ([]string, []interface{}, error) {
+	table := session.statement.RefTable
+	colNames := make([]string, 0, len(table.ColumnsSeq()))
+	args := make([]interface{}, 0, len(table.ColumnsSeq()))
+
+	for _, col := range table.Columns() {
+		if !col.IsVersion && !col.IsCreated && !col.IsUpdated {
+			if session.statement.omitColumnMap.contain(col.Name) {
+				continue
+			}
+		}
+		if col.MapType == core.ONLYFROMDB {
+			continue
+		}
+
+		fieldValuePtr, err := col.ValueOf(bean)
+		if err != nil {
+			return nil, nil, err
+		}
+		fieldValue := *fieldValuePtr
+
+		if col.IsAutoIncrement {
+			switch fieldValue.Type().Kind() {
+			case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int, reflect.Int64:
+				if fieldValue.Int() == 0 {
+					continue
+				}
+			case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint, reflect.Uint64:
+				if fieldValue.Uint() == 0 {
+					continue
+				}
+			case reflect.String:
+				if len(fieldValue.String()) == 0 {
+					continue
+				}
+			case reflect.Ptr:
+				if fieldValue.Pointer() == 0 {
+					continue
+				}
+			}
+		}
+
+		if (col.IsDeleted && !session.statement.unscoped) || col.IsCreated {
+			continue
+		}
+
+		if len(session.statement.columnMap) > 0 {
+			if !session.statement.columnMap.contain(col.Name) {
+				continue
+			} else if _, ok := session.statement.incrColumns[col.Name]; ok {
+				continue
+			} else if _, ok := session.statement.decrColumns[col.Name]; ok {
+				continue
+			}
+		}
+
+		// !evalphobia! set fieldValue as nil when column is nullable and zero-value
+		if _, ok := getFlagForColumn(session.statement.nullableMap, col); ok {
+			if col.Nullable && isZero(fieldValue.Interface()) {
+				var nilValue *int
+				fieldValue = reflect.ValueOf(nilValue)
+			}
+		}
+
+		if col.IsUpdated && session.statement.UseAutoTime /*&& isZero(fieldValue.Interface())*/ {
+			// if time is non-empty, then set to auto time
+			val, t := session.engine.nowTime(col)
+			args = append(args, val)
+
+			var colName = col.Name
+			session.afterClosures = append(session.afterClosures, func(bean interface{}) {
+				col := table.GetColumn(colName)
+				setColumnTime(bean, col, t)
+			})
+		} else if col.IsVersion && session.statement.checkVersion {
+			args = append(args, 1)
+		} else {
+			arg, err := session.value2Interface(col, fieldValue)
+			if err != nil {
+				return colNames, args, err
+			}
+			args = append(args, arg)
+		}
+
+		colNames = append(colNames, session.engine.Quote(col.Name)+" = ?")
+	}
+	return colNames, args, nil
 }

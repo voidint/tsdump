@@ -15,7 +15,6 @@ import (
 
 // Exist returns true if the record exist otherwise return false
 func (session *Session) Exist(bean ...interface{}) (bool, error) {
-	defer session.resetStatement()
 	if session.isAutoClose {
 		defer session.Close()
 	}
@@ -37,10 +36,18 @@ func (session *Session) Exist(bean ...interface{}) (bool, error) {
 					return false, err
 				}
 
-				sqlStr = fmt.Sprintf("SELECT * FROM %s WHERE %s LIMIT 1", tableName, condSQL)
+				if session.engine.dialect.DBType() == core.MSSQL {
+					sqlStr = fmt.Sprintf("SELECT top 1 * FROM %s WHERE %s", tableName, condSQL)
+				} else {
+					sqlStr = fmt.Sprintf("SELECT * FROM %s WHERE %s LIMIT 1", tableName, condSQL)
+				}
 				args = condArgs
 			} else {
-				sqlStr = fmt.Sprintf("SELECT * FROM %s LIMIT 1", tableName)
+				if session.engine.dialect.DBType() == core.MSSQL {
+					sqlStr = fmt.Sprintf("SELECT top 1 * FROM %s", tableName)
+				} else {
+					sqlStr = fmt.Sprintf("SELECT * FROM %s LIMIT 1", tableName)
+				}
 				args = []interface{}{}
 			}
 		} else {
@@ -50,7 +57,7 @@ func (session *Session) Exist(bean ...interface{}) (bool, error) {
 			}
 
 			if beanValue.Elem().Kind() == reflect.Struct {
-				if err := session.statement.setRefValue(beanValue.Elem()); err != nil {
+				if err := session.statement.setRefBean(bean[0]); err != nil {
 					return false, err
 				}
 			}
@@ -69,19 +76,11 @@ func (session *Session) Exist(bean ...interface{}) (bool, error) {
 		args = session.statement.RawParams
 	}
 
-	session.queryPreprocess(&sqlStr, args...)
-
-	var rawRows *core.Rows
-	if session.isAutoCommit {
-		_, rawRows, err = session.innerQuery(sqlStr, args...)
-	} else {
-		rawRows, err = session.tx.Query(sqlStr, args...)
-	}
+	rows, err := session.queryRows(sqlStr, args...)
 	if err != nil {
 		return false, err
 	}
+	defer rows.Close()
 
-	defer rawRows.Close()
-
-	return rawRows.Next(), nil
+	return rows.Next(), nil
 }

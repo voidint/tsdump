@@ -17,7 +17,6 @@ type Rows struct {
 	NoTypeCheck bool
 
 	session   *Session
-	stmt      *core.Stmt
 	rows      *core.Rows
 	fields    []string
 	beanType  reflect.Type
@@ -29,13 +28,11 @@ func newRows(session *Session, bean interface{}) (*Rows, error) {
 	rows.session = session
 	rows.beanType = reflect.Indirect(reflect.ValueOf(bean)).Type()
 
-	defer rows.session.resetStatement()
-
 	var sqlStr string
 	var args []interface{}
 	var err error
 
-	if err = rows.session.statement.setRefValue(rValue(bean)); err != nil {
+	if err = rows.session.statement.setRefBean(bean); err != nil {
 		return nil, err
 	}
 
@@ -53,32 +50,11 @@ func newRows(session *Session, bean interface{}) (*Rows, error) {
 		args = rows.session.statement.RawParams
 	}
 
-	for _, filter := range rows.session.engine.dialect.Filters() {
-		sqlStr = filter.Do(sqlStr, session.engine.dialect, rows.session.statement.RefTable)
-	}
-
-	rows.session.saveLastSQL(sqlStr, args...)
-	if rows.session.prepareStmt {
-		rows.stmt, err = rows.session.DB().Prepare(sqlStr)
-		if err != nil {
-			rows.lastError = err
-			rows.Close()
-			return nil, err
-		}
-
-		rows.rows, err = rows.stmt.Query(args...)
-		if err != nil {
-			rows.lastError = err
-			rows.Close()
-			return nil, err
-		}
-	} else {
-		rows.rows, err = rows.session.DB().Query(sqlStr, args...)
-		if err != nil {
-			rows.lastError = err
-			rows.Close()
-			return nil, err
-		}
+	rows.rows, err = rows.session.queryRows(sqlStr, args...)
+	if err != nil {
+		rows.lastError = err
+		rows.Close()
+		return nil, err
 	}
 
 	rows.fields, err = rows.rows.Columns()
@@ -118,18 +94,22 @@ func (rows *Rows) Scan(bean interface{}) error {
 		return fmt.Errorf("scan arg is incompatible type to [%v]", rows.beanType)
 	}
 
-	dataStruct := rValue(bean)
-	if err := rows.session.statement.setRefValue(dataStruct); err != nil {
+	if err := rows.session.statement.setRefBean(bean); err != nil {
 		return err
 	}
 
-	scanResults, err := rows.session.row2Slice(rows.rows, rows.fields, len(rows.fields), bean)
+	scanResults, err := rows.session.row2Slice(rows.rows, rows.fields, bean)
 	if err != nil {
 		return err
 	}
 
-	_, err = rows.session.slice2Bean(scanResults, rows.fields, len(rows.fields), bean, &dataStruct, rows.session.statement.RefTable)
-	return err
+	dataStruct := rValue(bean)
+	_, err = rows.session.slice2Bean(scanResults, rows.fields, bean, &dataStruct, rows.session.statement.RefTable)
+	if err != nil {
+		return err
+	}
+
+	return rows.session.executeProcessors()
 }
 
 // Close session if session.IsAutoClose is true, and claimed any opened resources
@@ -142,17 +122,10 @@ func (rows *Rows) Close() error {
 		if rows.rows != nil {
 			rows.lastError = rows.rows.Close()
 			if rows.lastError != nil {
-				defer rows.stmt.Close()
 				return rows.lastError
 			}
 		}
-		if rows.stmt != nil {
-			rows.lastError = rows.stmt.Close()
-		}
 	} else {
-		if rows.stmt != nil {
-			defer rows.stmt.Close()
-		}
 		if rows.rows != nil {
 			defer rows.rows.Close()
 		}
