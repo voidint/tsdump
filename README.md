@@ -35,15 +35,16 @@ USAGE:
   tsdump [OPTIONS] [database [table ...]]
 
 VERSION:
-  0.3.0
+  0.4.0
 
 AUTHOR:
-  voidnt <voidint@126.com>
+  voidint <voidint@126.com>
 
 OPTIONS:
   -D, --debug                 enable debug mode
   -h value, --host value      connect to host (default: "127.0.0.1")
   -P value, --port value      port number to use for connection (default: 3306)
+  -S value, --socket value    socket file to use for connection
   -u value, --user value      user for login if not current user (default: "voidint")
   -p value, --password value  password to use when connecting to server. If password is not given it's solicited on the tty.
   -V value, --viewer value    output viewer. Optional values: txt|csv|json|md (default: "txt")
@@ -52,7 +53,7 @@ OPTIONS:
   --version, -v               print the version
 
 COPYRIGHT:
-  Copyright (c) 2017, 2018, voidint. All rights reserved.
+  Copyright (c) 2017, 2019, voidint. All rights reserved.
 ```
 
 - 使用`root`用户创建一个名为`mydb`的数据库实例，以及一张`student`的表。
