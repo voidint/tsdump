@@ -2,15 +2,17 @@ language: go
 
 sudo: false
 
-go:
+go: 
     - master
 
 before_install:
-    - go get github.com/mattn/goveralls
+    - go get -t -v ./...
 
 script:
-    - GOOS=darwin go build
-    - GOOS=windows go build
-    - GOOS=linux go build
-    - $HOME/gopath/bin/goveralls -service=travis-ci
-    
+    - GO111MODULE=on GOOS=darwin go build
+    - GO111MODULE=on GOOS=windows go build
+    - GO111MODULE=on GOOS=linux go build
+    - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)

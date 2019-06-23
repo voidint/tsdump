@@ -1,6 +1,8 @@
 # tsdump
-[![Build Status](https://api.travis-ci.org/voidint/tsdump.png)](https://travis-ci.org/voidint/tsdump)
-[![Coverage Status](https://coveralls.io/repos/github/voidint/tsdump/badge.svg?branch=master)](https://coveralls.io/github/voidint/tsdump?branch=master)
+[![Build Status](https://travis-ci.org/voidint/tsdump.svg?branch=master)](https://travis-ci.org/voidint/tsdump)
+[![codecov](https://codecov.io/gh/voidint/tsdump/branch/master/graph/badge.svg)](https://codecov.io/gh/voidint/tsdump)
+[![codebeat badge](https://codebeat.co/badges/99dc335b-fd8a-4280-acf1-0eeb04a059e3)](https://codebeat.co/projects/github-com-voidint-tsdump-master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/voidint/tsdump)](https://goreportcard.com/report/github.com/voidint/tsdump)
 
 ## 目录
 - [特性](#特性)
@@ -15,7 +17,8 @@
 ## 安装
 - 源代码安装
   ```shell
-  $ go get -u github.com/voidint/tsdump
+  $ export GO111MODULE=on
+  $ go get -u -v github.com/voidint/tsdump
   ```
 - 二进制安装
 
