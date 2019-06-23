@@ -9,11 +9,10 @@ before_install:
     - go get -t -v ./...
 
 script:
-    - GOOS=darwin go build
-    - GOOS=windows go build
-    - GOOS=linux go build
+    - GO111MODULE=on GOOS=darwin go build
+    - GO111MODULE=on GOOS=windows go build
+    - GO111MODULE=on GOOS=linux go build
     - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
-    

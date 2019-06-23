@@ -74,7 +74,7 @@ func main() {
 	app.Copyright = "Copyright (c) 2017, 2019, voidint. All rights reserved."
 	app.Authors = []cli.Author{
 		cli.Author{
-			Name:  "voidnt",
+			Name:  "voidint",
 			Email: "voidint@126.com",
 		},
 	}
