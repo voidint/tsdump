@@ -88,6 +88,7 @@ type column struct {
 	CharSet   string `xorm:"'CHARACTER_SET_NAME'"`
 	Collation string `xorm:"'COLLATION_NAME'"`
 	Comment   string `xorm:"'COLUMN_COMMENT'"`
+	Extra     string `xorm:"'EXTRA'"`
 }
 
 func (column) TableName() string {
@@ -206,6 +207,7 @@ func (repo *Repo) GetColumns(cond *model.Column) (items []model.Column, err erro
 			CharSet:   cols[i].CharSet,
 			Collation: cols[i].Collation,
 			Comment:   cols[i].Comment,
+			Extra:     []string{cols[i].Extra},
 		})
 	}
 	return items, nil

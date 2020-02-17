@@ -28,17 +28,17 @@ type Table struct {
 
 // Column 列元信息
 type Column struct {
-	DB        string            `json:"-"`
-	Table     string            `json:"-"`
-	Name      string            `json:"name,omitempty"`
-	Default   string            `json:"default,omitempty"`
-	Nullable  string            `json:"nullable,omitempty"`
-	DataType  string            `json:"data_type,omitempty"`
-	Key       string            `json:"key,omitempty"`
-	CharSet   string            `json:"charset,omitempty"`
-	Collation string            `json:"collation,omitempty"`
-	Comment   string            `json:"comment,omitempty"`
-	Extra     map[string]string `json:"extra,omitempty"`
+	DB        string   `json:"-"`
+	Table     string   `json:"-"`
+	Name      string   `json:"name,omitempty"`
+	Default   string   `json:"default,omitempty"`
+	Nullable  string   `json:"nullable,omitempty"`
+	DataType  string   `json:"data_type,omitempty"`
+	Key       string   `json:"key,omitempty"`
+	CharSet   string   `json:"charset,omitempty"`
+	Collation string   `json:"collation,omitempty"`
+	Comment   string   `json:"comment,omitempty"`
+	Extra     []string `json:"extra,omitempty"`
 }
 
 // IRepo 数据库元信息查询接口
