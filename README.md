@@ -35,7 +35,7 @@ USAGE:
   tsdump [OPTIONS] [database [table ...]]
 
 VERSION:
-  0.4.1
+  0.4.2
 
 AUTHOR:
   voidint <voidint@126.com>
@@ -146,6 +146,9 @@ COPYRIGHT:
 
 
 ## Changelog
+### 0.4.2 - 2020/05/22
+- 更新依赖（xorm）避免`go get`编译错误
+
 ### 0.4.1 - 2020/01/05
 - 修订版权信息
 
