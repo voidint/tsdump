@@ -16,13 +16,14 @@ import (
 	"github.com/voidint/tsdump/view/txt"
 	"golang.org/x/crypto/ssh/terminal"
 
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/voidint/tsdump/view/csv"
 	_ "github.com/voidint/tsdump/view/json"
 	_ "github.com/voidint/tsdump/view/md"
 	_ "github.com/voidint/tsdump/view/txt"
 )
 
-const shortVersion = "0.4.1"
+const shortVersion = "0.4.2"
 
 var (
 	username string

@@ -3,10 +3,9 @@ package mysql
 import (
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/go-xorm/xorm"
 	"github.com/voidint/tsdump/config"
 	"github.com/voidint/tsdump/model"
+	"xorm.io/xorm"
 )
 
 // Repo MySQL的model.IRepo接口实现
