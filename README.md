@@ -4,6 +4,8 @@
 [![codebeat badge](https://codebeat.co/badges/99dc335b-fd8a-4280-acf1-0eeb04a059e3)](https://codebeat.co/projects/github-com-voidint-tsdump-master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/voidint/tsdump)](https://goreportcard.com/report/github.com/voidint/tsdump)
 
+**注意：**`master`分支可能处于开发之中并**非稳定版本**，请通过tag下载稳定版本的源代码，或通过[release](https://github.com/voidint/tsdump/releases)下载已编译的二进制可执行文件。
+
 ## 目录
 - [特性](#特性)
 - [安装](#安装)
