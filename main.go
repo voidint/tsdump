@@ -23,7 +23,7 @@ import (
 	_ "github.com/voidint/tsdump/view/txt"
 )
 
-const shortVersion = "0.4.2"
+const shortVersion = "0.5.0-dev"
 
 var (
 	username string
