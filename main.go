@@ -21,6 +21,7 @@ import (
 	_ "github.com/voidint/tsdump/view/json"
 	_ "github.com/voidint/tsdump/view/md"
 	_ "github.com/voidint/tsdump/view/txt"
+	_ "github.com/voidint/tsdump/view/xlsx"
 )
 
 const shortVersion = "0.5.0-dev"
