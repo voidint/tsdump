@@ -1,24 +1,27 @@
+GOPATH=
 GO111MODULE=on
 GOPROXY=https://goproxy.cn,direct
 
+GO = CGO_ENABLED=0 go
 BUILD_DATE := $(shell date '+%Y-%m-%d %H:%M:%S')
+GIT_BRANCH := $(shell git symbolic-ref --short -q HEAD)
 GIT_COMMIT_HASH := $(shell git rev-parse --verify HEAD)
-GO_BUILD_FLAGS := -v -trimpath -ldflags '-s -w -X "github.com/voidint/tsdump/build.Date=$(BUILD_DATE)" -X "github.com/voidint/tsdump/build.Commit=$(GIT_COMMIT_HASH)"'
+GO_FLAGS := -v -ldflags="-X 'github.com/voidint/tsdump/build.Build=$(BUILD_DATE)' -X 'github.com/voidint/tsdump/build.Commit=$(GIT_COMMIT_HASH)' -X 'github.com/voidint/tsdump/build.Branch=$(GIT_BRANCH)'"
 
 all: install test
 
 build:
 	@echo "GO111MODULE=$(GO111MODULE)"
 	@echo "GOPROXY=$(GOPROXY)"
-	go build $(GO_BUILD_FLAGS)
+	$(GO) build $(GO_FLAGS)
 
 install: build
-	go install $(GO_BUILD_FLAGS)
+	$(GO) install $(GO_FLAGS)
 
 test:
-	go test -v ./...
+	$(GO) test -v ./...
 
 clean:
-	go clean -x
+	$(GO) clean -x
 
-.PHONY: all build test
+.PHONY: all build install test clean
