@@ -19,8 +19,7 @@
 ## 安装
 - 源代码安装
   ```shell
-  $ export GO111MODULE=on
-  $ go get -u -v github.com/voidint/tsdump
+  $ GO111MODULE=on go get -u -v github.com/voidint/tsdump@v0.4.2
   ```
 - 二进制安装
 
