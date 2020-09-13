@@ -1,24 +1,36 @@
 package build
 
-import "bytes"
+import "strings"
 
+const (
+	// ShortVersion 短版本号
+	ShortVersion = "0.5.0-dev"
+)
+
+// The value of variables come form `gb build -ldflags '-X "build.Build=xxxxx" -X "build.CommitID=xxxx"' `
 var (
-	// Date 编译时间
-	Date string
-	// Commit git提交ID
+	// Build build time
+	Build string
+	// Branch current git branch
+	Branch string
+	// Commit git commit id
 	Commit string
 )
 
 // Version 生成版本信息
-func Version(prefix string) string {
-	var buf bytes.Buffer
-	if prefix != "" {
-		buf.WriteString(prefix)
-	}
-	if Date != "" {
+func Version() string {
+	var buf strings.Builder
+	buf.WriteString(ShortVersion)
+
+	if Build != "" {
 		buf.WriteByte('\n')
-		buf.WriteString("date: ")
-		buf.WriteString(Date)
+		buf.WriteString("build: ")
+		buf.WriteString(Build)
+	}
+	if Branch != "" {
+		buf.WriteByte('\n')
+		buf.WriteString("branch: ")
+		buf.WriteString(Branch)
 	}
 	if Commit != "" {
 		buf.WriteByte('\n')

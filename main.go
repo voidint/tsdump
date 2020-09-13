@@ -24,8 +24,6 @@ import (
 	_ "github.com/voidint/tsdump/view/xlsx"
 )
 
-const shortVersion = "0.5.0-dev"
-
 var (
 	username string
 	c        config.Config
@@ -60,7 +58,7 @@ OPTIONS:
 
 COPYRIGHT:
 	{{.Copyright}}{{end}}
-`, shortVersion)
+`, build.ShortVersion)
 
 	u, err := user.Current()
 	if err == nil {
@@ -72,7 +70,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
-	app.Version = build.Version(shortVersion)
+	app.Version = build.Version()
 	app.Copyright = "Copyright (c) 2017-2020, voidint. All rights reserved."
 	app.Authors = []cli.Author{
 		cli.Author{
