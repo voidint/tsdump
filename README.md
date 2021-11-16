@@ -13,13 +13,13 @@
 - [Changelog](#changelog)
 
 ## 特性
-- 支持将数据库(当前仅支持`MySQL`)及其表结构的元数据以`text`、`markdown`、`json`、`csv`形式输出。
+- 支持将数据库(当前仅支持`MySQL`)及其表结构的元数据以`text`、`markdown`、`json`、`csv`、`xlsx`形式输出。
 
 
 ## 安装
 - 源代码安装
   ```shell
-  $ GO111MODULE=on go get -u -v github.com/voidint/tsdump@v0.4.2
+  $ GO111MODULE=on GOPROXY=https://goproxy.cn go install -v github.com/voidint/tsdump@v0.5.0
   ```
 - 二进制安装
 
@@ -36,7 +36,7 @@ USAGE:
   tsdump [OPTIONS] [database [table ...]]
 
 VERSION:
-  0.4.2
+  0.5.0
 
 AUTHOR:
   voidint <voidint@126.com>
@@ -48,13 +48,14 @@ OPTIONS:
   -S value, --socket value    socket file to use for connection
   -u value, --user value      user for login if not current user (default: "voidint")
   -p value, --password value  password to use when connecting to server. If password is not given it's solicited on the tty.
-  -V value, --viewer value    output viewer. Optional values: txt|csv|json|md (default: "txt")
+  -V value, --viewer value    output viewer. Optional values: csv|json|md|xlsx|txt (default: "txt")
   -o value, --output value    write to a file, instead of STDOUT
+  -s, --sorted                sort table columns
   --help                      show help
   --version, -v               print the version
 
 COPYRIGHT:
-  Copyright (c) 2017-2020, voidint. All rights reserved.
+  Copyright (c) 2017-2021, voidint. All rights reserved.
 ```
 
 - 使用`root`用户创建一个名为`mydb`的数据库实例，以及一张`student`的表。
@@ -147,6 +148,10 @@ COPYRIGHT:
 
 
 ## Changelog
+### 0.5.0 - 2021/11/16
+- 支持以`xlsx`视图方式导出表结构数据。[#27](https://github.com/voidint/tsdump/issues/27)
+- 新增`-s`选项以支持对数据库、表、字段按字典序排列。[#28](https://github.com/voidint/tsdump/issues/28)
+
 ### 0.4.2 - 2020/05/22
 - 更新依赖（xorm）避免`go get`编译错误
 
