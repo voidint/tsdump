@@ -4,7 +4,7 @@ import "strings"
 
 const (
 	// ShortVersion 短版本号
-	ShortVersion = "0.5.0-dev"
+	ShortVersion = "0.5.0"
 )
 
 // The value of variables come form `gb build -ldflags '-X "build.Build=xxxxx" -X "build.CommitID=xxxx"' `
