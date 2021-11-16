@@ -5,7 +5,9 @@ import (
 	"io"
 	"os"
 	"os/user"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/urfave/cli"
 	"github.com/voidint/tsdump/build"
@@ -67,11 +69,12 @@ COPYRIGHT:
 }
 
 func main() {
+	now := time.Now()
 	app := cli.NewApp()
 	app.Name = "tsdump"
 	app.Usage = "Database table structure dump tool."
 	app.Version = build.Version()
-	app.Copyright = "Copyright (c) 2017-2020, voidint. All rights reserved."
+	app.Copyright = fmt.Sprintf("Copyright (c) 2017-%d, voidint. All rights reserved.", now.Year())
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "voidint",
@@ -127,6 +130,11 @@ func main() {
 			Usage:       "write to a file, instead of STDOUT",
 			Destination: &c.Output,
 		},
+		cli.BoolFlag{
+			Name:        "s, sorted",
+			Usage:       "sort table columns",
+			Destination: &c.Sorted,
+		},
 	}
 
 	app.Before = func(ctx *cli.Context) (err error) {
@@ -153,6 +161,10 @@ func main() {
 		dbs, err := getMetadata(repo, c.DB, c.Tables...)
 		if err != nil {
 			return cli.NewExitError(fmt.Sprintf("[tsdump] %s", err.Error()), 1)
+		}
+
+		if c.Sorted {
+			sortedDBs(dbs)
 		}
 
 		if c.Output != "" {
@@ -230,4 +242,29 @@ func getMetadata(repo model.IRepo, db string, tables ...string) (dbs []model.DB,
 		}
 	}
 	return dbs, nil
+}
+
+func sortedDBs(dbs []model.DB) {
+	for i := range dbs {
+		sortedTables(dbs[i].Tables)
+	}
+
+	sort.Slice(dbs, func(i, j int) bool {
+		return dbs[i].Name < dbs[j].Name
+	})
+}
+
+func sortedTables(tables []model.Table) {
+	for i := range tables {
+		sortedColumns(tables[i].Columns)
+	}
+	sort.Slice(tables, func(i, j int) bool {
+		return tables[i].Name < tables[j].Name
+	})
+}
+
+func sortedColumns(columns []model.Column) {
+	sort.Slice(columns, func(i, j int) bool {
+		return columns[i].Name < columns[j].Name
+	})
 }

@@ -12,4 +12,5 @@ type Config struct {
 	Viewer   string
 	Output   string
 	Debug    bool
+	Sorted   bool
 }
