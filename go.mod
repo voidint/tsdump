@@ -1,7 +1,6 @@
 module github.com/voidint/tsdump
 
-go 1.17
-
+go 1.18
 
 require (
 	github.com/go-sql-driver/mysql v1.5.0
@@ -9,7 +8,6 @@ require (
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a
 	github.com/tealeg/xlsx/v3 v3.2.0
 	github.com/urfave/cli v1.22.4
-	github.com/voidint/tsdump v0.0.0-00010101000000-000000000000
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	gopkg.in/yaml.v2 v2.2.8
 	xorm.io/xorm v1.0.4
