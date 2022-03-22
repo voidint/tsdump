@@ -24,6 +24,7 @@ import (
 	_ "github.com/voidint/tsdump/view/md"
 	_ "github.com/voidint/tsdump/view/txt"
 	_ "github.com/voidint/tsdump/view/xlsx"
+	_ "github.com/voidint/tsdump/view/yaml"
 )
 
 var (
