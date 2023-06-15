@@ -4,15 +4,15 @@
     "importpath": "github.com/voidint/tsdump/build",
     "variables": [
         {
-            "variable": "Build",
+            "variable": "Built",
             "value": "{{.Date}}"
         },
         {
-            "variable": "Commit",
-            "value": "{{.GitCommit}}"
+            "variable": "GitCommit",
+            "value": "$(git rev-parse HEAD|cut -c 1-8)"
         },
         {
-            "variable": "Branch",
+            "variable": "GitBranch",
             "value": "$(git symbolic-ref --short -q HEAD)"
         }
     ]
